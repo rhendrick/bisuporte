@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Union Sistemas | BI Gestão de Suporte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; margin: 0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        .tab-btn.active { background-color: #1e293b; color: #fff; border-left: 4px solid #3b82f6; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .kpi-card { transition: all 0.2s; }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        #loader {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+        }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex overflow-hidden">
+
+    <div id="loader">
+        <div class="spinner mb-4"></div>
+        <h2 class="text-xl font-bold tracking-widest">Sincronizando com Movidesk...</h2>
+        <p class="text-sm text-slate-400 mt-2">Buscando Tickets e roteando a nova API de CSAT...</p>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 shadow-xl z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-800">
+            <div class="bg-blue-600 p-2 rounded-lg text-white font-bold"><i class="fa-solid fa-chart-line"></i></div>
+            <div>
+                <h1 class="text-sm font-bold text-white tracking-wide">BI SUPORTE</h1>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest">Union Sistemas</p>
+            </div>
+        </div>
+        
+        <div class="p-4 flex flex-col gap-2 flex-1 mt-2">
+            <div class="mb-6 pb-6 border-b border-slate-800">
+                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-3">Filtro Global</p>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Mês / Ano</label>
+                        <select id="filterMes" class="w-full bg-slate-800 border border-slate-700 text-sm text-slate-200 rounded p-2 outline-none focus:border-blue-500" onchange="onMesChange()"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Dia Específico</label>
+                        <select id="filterDia" class="w-full bg-slate-800 border border-slate-700 text-sm text-slate-200 rounded p-2 outline-none focus:border-blue-500" onchange="applyFilters()"></select>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Painéis Operacionais</p>
+            <button class="tab-btn active text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-geral', this)"><i class="fa-solid fa-chart-pie w-4"></i> Executivo Global</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-comparativo', this)"><i class="fa-solid fa-scale-balanced w-4"></i> Comparativos</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-analista-diario', this)"><i class="fa-solid fa-user-check w-4"></i> Meu Painel (Diário)</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('base-dados', this)"><i class="fa-solid fa-database w-4"></i> Base de Chamados</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-legendas', this)"><i class="fa-solid fa-book-open w-4"></i> Dicionário de Métricas</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 relative">
+        <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shrink-0 shadow-sm z-10">
+            <h2 class="text-xl font-bold text-slate-800" id="header-title">Visão Geral & KPIs</h2>
+            <div class="flex items-center gap-3">
+                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-bold cursor-pointer transition shadow-md">
+                    <i class="fa-solid fa-file-excel mr-2"></i> Exportar Dados
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 scrollbar-thin">
+            
+            <!-- TAB 1: VISÃO GERAL -->
+            <div id="visao-geral" class="tab-content active space-y-6">
+                <div class="grid grid-cols-7 gap-4 mb-2">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-slate-800">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">Recebidos</p>
+                        <h3 class="text-3xl font-black text-slate-800" id="kpi-recebidos">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-emerald-400">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">Resolvidos</p>
+                        <h3 class="text-3xl font-black text-emerald-500" id="kpi-resolvidos">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-orange-500">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">Backlog Fila</p>
+                        <h3 class="text-3xl font-black text-orange-600" id="kpi-backlog">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-blue-500">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">SLA Médio</p>
+                        <h3 class="text-3xl font-black text-blue-600" id="kpi-sla">0%</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-emerald-500">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">FCR Global</p>
+                        <h3 class="text-3xl font-black text-emerald-600" id="kpi-fcr">0%</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-purple-500">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">MTTR (h)</p>
+                        <h3 class="text-3xl font-black text-purple-600" id="kpi-mttr">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-yellow-400">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-1 tracking-wider">CSAT</p>
+                        <h3 class="text-3xl font-black text-slate-800" id="kpi-csat">0.0</h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4">Tendência Operacional (Volume vs % SLA)</h3>
+                        <div class="relative h-72 w-full"><canvas id="chartEvolucao"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4">Gargalos do Backlog (O que trava a fila?)</h3>
+                        <div class="relative h-72 w-full"><canvas id="chartEspera"></canvas></div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4">Análise de Causa Raiz (Apoio a Produto)</h3>
+                    <div class="relative h-64 w-full"><canvas id="chartCausaRaiz"></canvas></div>
+                </div>
+            </div>
+
+            <!-- TAB 2: COMPARATIVOS -->
+            <div id="visao-comparativo" class="tab-content space-y-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-days text-blue-500 mr-2"></i> Comparativo Mensal (MoM)</h3>
+                        <div class="flex gap-4 items-center">
+                            <select id="compMesA" class="bg-slate-50 border border-slate-300 rounded p-2 text-sm font-medium" onchange="calcularComparativos()"></select>
+                            <span class="text-slate-400 font-bold text-sm">VS</span>
+                            <select id="compMesB" class="bg-slate-50 border border-slate-300 rounded p-2 text-sm font-medium" onchange="calcularComparativos()"></select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-6 gap-4 mb-6" id="cards-delta-mensal"></div>
+                    <div class="relative h-64 w-full"><canvas id="chartCompMensal"></canvas></div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-week text-purple-500 mr-2"></i> Comparativo Semanal (WoW)</h3>
+                        <div class="flex gap-4 items-center">
+                            <select id="compSemA" class="bg-slate-50 border border-slate-300 rounded p-2 text-sm font-medium min-w-[150px]" onchange="calcularComparativos()"></select>
+                            <span class="text-slate-400 font-bold text-sm">VS</span>
+                            <select id="compSemB" class="bg-slate-50 border border-slate-300 rounded p-2 text-sm font-medium min-w-[150px]" onchange="calcularComparativos()"></select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-6 gap-4" id="cards-delta-semanal"></div>
+                </div>
+            </div>
+
+            <!-- TAB 3: DASHBOARD DIÁRIO DO ANALISTA -->
+            <div id="visao-analista-diario" class="tab-content">
+                <div class="bg-slate-800 rounded-xl shadow-md border border-slate-700 p-6 mb-6 flex justify-between items-center text-white">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-xl font-bold"><i class="fa-solid fa-user-astronaut"></i></div>
+                        <div>
+                            <h2 class="text-xl font-bold tracking-wide">Painel de Acompanhamento Diário</h2>
+                            <p class="text-sm text-slate-400">Selecione o analista para carregar a fila individual e histórico.</p>
+                        </div>
+                    </div>
+                    <select id="selectAnalista" class="bg-slate-900 border border-slate-600 text-white rounded-lg p-3 text-sm font-bold outline-none focus:border-blue-500 min-w-[250px]" onchange="renderDashAnalista()"></select>
+                </div>
+
+                <div class="grid grid-cols-6 gap-4 mb-6" id="cards-analista"></div>
+
+                <div class="grid grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4">Minha Produtividade (Entrada vs Saída)</h3>
+                        <div class="relative h-64 w-full"><canvas id="chartProdutividadeAnalista"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4">Meu Backlog (Gargalos Pessoais)</h3>
+                        <div class="relative h-64 w-full"><canvas id="chartBacklogAnalista"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-list-check text-blue-500 mr-2"></i> Minha Fila de Pendências (Necessitam Ação)</h3>
+                    </div>
+                    <div class="overflow-x-auto max-h-80 scrollbar-thin">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-100 border-b sticky top-0 shadow-sm z-10">
+                                <tr><th class="px-4 py-3">Chamado</th><th class="px-4 py-3">Aberto em</th><th class="px-4 py-3">Status Atual</th><th class="px-4 py-3">Motivo Espera</th></tr>
+                            </thead>
+                            <tbody id="table-fila-analista" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Matriz Comparativa da Equipe</h3>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b">
+                                <tr><th class="px-6 py-4">Analista</th><th class="px-6 py-4 text-center">Resolvidos</th><th class="px-6 py-4 text-center">Fila Retida</th><th class="px-6 py-4 text-center">SLA</th><th class="px-6 py-4 text-center">FCR</th><th class="px-6 py-4 text-center">MTTR Médio</th><th class="px-6 py-4 text-center">CSAT</th></tr>
+                            </thead>
+                            <tbody id="table-comparativo-equipe" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: BASE DE DADOS -->
+            <div id="base-dados" class="tab-content">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[600px]">
+                    <div class="p-4 border-b border-slate-200 flex items-center gap-3 bg-slate-50">
+                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-list-ul text-blue-500 mr-2"></i> Registros Analíticos Sincronizados</h3>
+                        <span id="contador-base" class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider">0 resultados</span>
+                    </div>
+                    <div class="flex-1 overflow-auto scrollbar-thin">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-4 py-3">ID</th><th class="px-4 py-3">Data</th>
+                                    <th class="px-4 py-3">Analista</th><th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Espera</th><th class="px-4 py-3">Causa Raiz</th>
+                                    <th class="px-4 py-3">SLA</th><th class="px-4 py-3">FCR</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-base-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: LEGENDA DE MÉTRICAS -->
+            <div id="visao-legendas" class="tab-content">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2 border-b border-slate-100 pb-4">Dicionário de Indicadores Operacionais</h2>
+                    <p class="text-sm text-slate-500 mb-8">Consulte o significado, a utilidade e o impacto de cada métrica acompanhada na gestão de suporte.</p>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="border border-slate-200 p-5 rounded-lg border-l-4 border-l-emerald-500 hover:shadow-md transition">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-bolt text-emerald-500"></i> FCR (First Contact Resolution)</h3>
+                            <p class="text-sm font-semibold text-slate-600 mb-1">O que é:</p>
+                            <p class="text-sm text-slate-500 mb-3">Resolução no Primeiro Contato. Mede a porcentagem de chamados resolvidos logo na primeira interação com o cliente sem reaberturas.</p>
+                        </div>
+                        <div class="border border-slate-200 p-5 rounded-lg border-l-4 border-l-yellow-400 hover:shadow-md transition">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-star text-yellow-400"></i> CSAT (Customer Satisfaction Score)</h3>
+                            <p class="text-sm font-semibold text-slate-600 mb-1">O que é:</p>
+                            <p class="text-sm text-slate-500 mb-3">Índice de Satisfação do Cliente gerado pelas respostas das pesquisas pós-atendimento.</p>
+                        </div>
+                        <div class="border border-slate-200 p-5 rounded-lg border-l-4 border-l-blue-500 hover:shadow-md transition">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-stopwatch text-blue-500"></i> SLA (Service Level Agreement)</h3>
+                            <p class="text-sm font-semibold text-slate-600 mb-1">O que é:</p>
+                            <p class="text-sm text-slate-500 mb-3">Mede a porcentagem de chamados resolvidos dentro do prazo estipulado no contrato do cliente.</p>
+                        </div>
+                        <div class="border border-slate-200 p-5 rounded-lg border-l-4 border-l-orange-500 hover:shadow-md transition">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group text-orange-500"></i> Backlog</h3>
+                            <p class="text-sm font-semibold text-slate-600 mb-1">O que é:</p>
+                            <p class="text-sm text-slate-500 mb-3">Volume exato de tickets que estão em aberto na fila, aguardando qualquer tipo de atuação da equipe.</p>
+                        </div>
+                        <div class="border border-slate-200 p-5 rounded-lg border-l-4 border-l-purple-500 hover:shadow-md transition">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-purple-500"></i> MTTR (Mean Time to Resolution)</h3>
+                            <p class="text-sm font-semibold text-slate-600 mb-1">O que é:</p>
+                            <p class="text-sm text-slate-500 mb-3">Tempo Médio de Resolução. Horas decorridas entre a abertura do chamado e o seu encerramento total.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ==============================================================================
+        // CHAVE DA API MOVIDESK
+        // ==============================================================================
+        const MOVIDESK_TOKEN = "88599593-1148-4b69-89ca-b4a2c55623aa"; 
+        
+        const STATUS_ENCERRADOS = ["Resolvido", "Fechado", "Closed", "Cancelado", "Canceled"];
+
+        Chart.register(ChartDataLabels);
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.plugins.datalabels.color = '#1e293b';
+        Chart.defaults.plugins.datalabels.font = { weight: 'bold', size: 11 };
+        Chart.defaults.plugins.datalabels.formatter = (value) => value > 0 ? value : '';
+
+        let rawData = [];
+        let filteredData = [];
+        let charts = {};
+
+        async function fetchMovideskDireto() {
+            if(!MOVIDESK_TOKEN || MOVIDESK_TOKEN === "COLE_SUA_CHAVE_AQUI") {
+                alert("Token do Movidesk não configurado!");
+                return [];
+            }
+
+            const dataFiltro = new Date();
+            dataFiltro.setDate(dataFiltro.getDate() - 30);
+            const dataIso = dataFiltro.toISOString();
+
+            // Rota de Tickets (A principal)
+            const urlTickets = `https://api.movidesk.com/public/v1/tickets?token=${MOVIDESK_TOKEN}` +
+                        `&$select=id,createdDate,resolvedIn,status,category,justification,resolvedInFirstCall,slaSolutionDate` +
+                        `&$expand=owner($select=businessName)` +
+                        `&$filter=createdDate ge ${dataIso}`;
+
+            // NOVA Rota EXCLUSIVA de CSAT criada pelo Movidesk
+            const urlCsat = `https://api.movidesk.com/public/v1/survey/responses?token=${MOVIDESK_TOKEN}&$top=1000&$orderby=date desc`;
+
+            try {
+                // Dispara as duas chamadas ao mesmo tempo para não deixar o painel lento
+                const [responseTickets, responseCsat] = await Promise.all([
+                    fetch(urlTickets),
+                    fetch(urlCsat).catch(() => null) // Se falhar por permissão, não quebra tudo
+                ]);
+
+                if (!responseTickets.ok) throw new Error(`Erro na API de Tickets: ${responseTickets.status}`);
+                
+                const jsonMovidesk = await responseTickets.json();
+                let notasCsatMapeadas = {};
+
+                // Processa a nova API de CSAT se ela retornar sucesso
+                if(responseCsat && responseCsat.ok) {
+                    const jsonCsat = await responseCsat.json();
+                    jsonCsat.forEach(survey => {
+                        if(survey.ticketId) {
+                            notasCsatMapeadas[survey.ticketId] = parseFloat(survey.response || survey.rating || survey.value) || 0;
+                        }
+                    });
+                }
+                
+                return jsonMovidesk.map(ticket => {
+                    const dataCriacao = new Date(ticket.createdDate);
+                    const mesAno = dataCriacao.toISOString().substring(0, 7);
+                    const semanaNum = Math.ceil(dataCriacao.getDate() / 7);
+
+                    let mttrHoras = 0;
+                    if (ticket.resolvedIn) {
+                        const dataResolucao = new Date(ticket.resolvedIn);
+                        mttrHoras = Math.abs(dataResolucao - dataCriacao) / (1000 * 60 * 60);
+                    }
+
+                    // Agora cruza o ID do ticket com o mapa gerado pela Nova API
+                    let notaCsat = notasCsatMapeadas[ticket.id] || 0;
+
+                    let slaCumprido = "Sim";
+                    if (ticket.slaSolutionDate) {
+                        const dataLimiteSla = new Date(ticket.slaSolutionDate);
+                        const dataTermino = ticket.resolvedIn ? new Date(ticket.resolvedIn) : new Date();
+                        if (dataTermino > dataLimiteSla) {
+                            slaCumprido = "Não";
+                        }
+                    }
+
+                    return {
+                        "ID_Chamado": `#${ticket.id}`,
+                        "Data": dataCriacao.toISOString().split('T')[0],
+                        "Mes_Ano": mesAno,
+                        "Semana": `${mesAno} - Sem ${semanaNum > 4 ? 4 : semanaNum}`,
+                        "Analista": ticket.owner ? ticket.owner.businessName : "Não Atribuído",
+                        "Status": ticket.status || "Indefinido",
+                        "Motivo_Espera": ticket.justification || "Nenhum",
+                        "Causa_Raiz": ticket.category || "Não classificado",
+                        "SLA_Cumprido": slaCumprido, 
+                        "FCR": ticket.resolvedInFirstCall ? "Sim" : "Não",
+                        "MTTR_Horas": mttrHoras,
+                        "CSAT": notaCsat
+                    };
+                });
+            } catch (error) {
+                console.error(error);
+                alert("Bloqueio de CORS ou erro de API. Verifique a consola (F12). O navegador pode estar a bloquear o pedido por segurança local.");
+                return [];
+            }
+        }
+
+        window.onload = async () => {
+            try {
+                rawData = await fetchMovideskDireto();
+                if(rawData.length > 0) {
+                    populateFilters();
+                    applyFilters();
+                }
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        };
+
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'border-blue-600', 'bg-slate-800'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active', 'border-blue-600', 'bg-slate-800');
+            
+            const titles = {
+                'visao-geral': 'Visão Geral & KPIs', 
+                'visao-comparativo': 'Painel de Comparativos', 
+                'visao-analista-diario': 'Acompanhamento Diário do Analista', 
+                'base-dados': 'Extração Analítica Movidesk',
+                'visao-legendas': 'Dicionário de Métricas'
+            };
+            document.getElementById('header-title').innerText = titles[tabId];
+            if(tabId === 'visao-analista-diario') renderDashAnalista();
+        }
+
+        function populateFilters() {
+            const meses = [...new Set(rawData.map(d => d.Mes_Ano))].sort().reverse();
+            const semanas = [...new Set(rawData.map(d => d.Semana))].sort().reverse();
+            const analistas = [...new Set(rawData.map(d => d.Analista))].sort();
+            
+            const renderSelect = (arr, elId, includeAll = false) => {
+                const sel = document.getElementById(elId);
+                if(!sel) return;
+                sel.innerHTML = includeAll ? '<option value="ALL">Todos os Meses</option>' : '';
+                arr.forEach(i => sel.innerHTML += `<option value="${i}">${i}</option>`);
+            };
+
+            renderSelect(meses, 'filterMes', true);
+            renderSelect(meses, 'compMesA'); renderSelect(meses, 'compMesB');
+            renderSelect(semanas, 'compSemA'); renderSelect(semanas, 'compSemB');
+            renderSelect(analistas, 'selectAnalista');
+            
+            if(meses.length >= 2) document.getElementById('compMesB').value = meses[1];
+            if(semanas.length >= 2) document.getElementById('compSemB').value = semanas[1];
+        }
+
+        function onMesChange() {
+            document.getElementById('filterDia').value = "ALL";
+            applyFilters();
+        }
+
+        function updateDiaDropdown() {
+            const mes = document.getElementById('filterMes').value;
+            const dadosBase = mes === "ALL" ? rawData : rawData.filter(d => d.Mes_Ano === mes);
+            const dias = [...new Set(dadosBase.map(d => d.Data))].sort().reverse();
+            
+            const selDia = document.getElementById('filterDia');
+            if(!selDia) return;
+            
+            const valAtual = selDia.value;
+            selDia.innerHTML = '<option value="ALL">Todos os Dias</option>';
+            
+            const hojeIso = new Date().toISOString().split('T')[0];
+            let dataOntem = new Date();
+            dataOntem.setDate(dataOntem.getDate() - 1);
+            const ontemIso = dataOntem.toISOString().split('T')[0];
+
+            dias.forEach(i => {
+                const [ano, m, dia] = i.split('-');
+                let label = `${dia}/${m}/${ano}`;
+                
+                if (i === hojeIso) label = `Hoje (${label})`;
+                if (i === ontemIso) label = `Ontem (${label})`;
+                
+                selDia.innerHTML += `<option value="${i}">${label}</option>`;
+            });
+            
+            if(valAtual !== "ALL" && dias.includes(valAtual)) {
+                selDia.value = valAtual;
+            }
+        }
+
+        function applyFilters() {
+            updateDiaDropdown();
+            
+            const mes = document.getElementById('filterMes').value;
+            const dia = document.getElementById('filterDia').value;
+            
+            filteredData = rawData;
+            if(mes !== "ALL") filteredData = filteredData.filter(d => d.Mes_Ano === mes);
+            if(dia !== "ALL") filteredData = filteredData.filter(d => d.Data === dia);
+            
+            calculateGlobalKPIs();
+            renderChartsGlobais();
+            calcularComparativos();
+            renderTabelasGerais();
+            renderDashAnalista();
+        }
+
+        function calcMetrics(dataset) {
+            const recebidos = dataset.length;
+            const resArr = dataset.filter(d => STATUS_ENCERRADOS.includes(d.Status));
+            const resolvidos = resArr.length;
+            
+            const slaRate = resolvidos > 0 ? (resArr.filter(d => d.SLA_Cumprido === "Sim").length / resolvidos) * 100 : 0;
+            const fcrRate = resolvidos > 0 ? (resArr.filter(d => d.FCR === "Sim").length / resolvidos) * 100 : 0;
+            const mttr = resolvidos > 0 ? resArr.reduce((s, d) => s + d.MTTR_Horas, 0) / resolvidos : 0;
+            const csatArr = resArr.filter(d => d.CSAT > 0);
+            const csat = csatArr.length > 0 ? csatArr.reduce((s, d) => s + d.CSAT, 0) / csatArr.length : 0;
+            
+            return { recebidos, backlog: recebidos - resolvidos, resolvidos, slaRate, fcrRate, mttr, csat };
+        }
+
+        function calculateGlobalKPIs() {
+            const m = calcMetrics(filteredData);
+            document.getElementById('kpi-recebidos').innerText = m.recebidos;
+            document.getElementById('kpi-resolvidos').innerText = m.resolvidos;
+            document.getElementById('kpi-backlog').innerText = m.backlog;
+            document.getElementById('kpi-sla').innerText = `${m.slaRate.toFixed(1)}%`;
+            document.getElementById('kpi-fcr').innerText = `${m.fcrRate.toFixed(1)}%`;
+            document.getElementById('kpi-mttr').innerText = m.mttr.toFixed(1);
+            document.getElementById('kpi-csat').innerText = m.csat.toFixed(1);
+        }
+
+        function renderDashAnalista() {
+            if(document.getElementById('visao-analista-diario').style.display === 'none') return;
+            const analistaSel = document.getElementById('selectAnalista').value;
+            if(!analistaSel) return;
+
+            const dadosA = filteredData.filter(d => d.Analista === analistaSel);
+            const m = calcMetrics(dadosA);
+
+            const cardUI = (tit, val, bg, txt, ic) => `<div class="${bg} border border-slate-200 p-4 rounded-xl"><div class="flex justify-between items-start mb-2"><p class="text-[10px] font-bold text-slate-500 uppercase">${tit}</p><i class="fa-solid ${ic} text-slate-300"></i></div><h3 class="text-3xl font-black ${txt}">${val}</h3></div>`;
+
+            document.getElementById('cards-analista').innerHTML = 
+                cardUI('Total Resolvido', m.resolvidos, 'bg-white', 'text-slate-800', 'fa-check') + 
+                cardUI('Fila Atual', m.backlog, 'bg-orange-50', 'text-orange-600', 'fa-layer-group') + 
+                cardUI('SLA Pessoal', m.slaRate.toFixed(1)+'%', 'bg-blue-50', 'text-blue-600', 'fa-stopwatch') + 
+                cardUI('FCR Pessoal', m.fcrRate.toFixed(1)+'%', 'bg-emerald-50', 'text-emerald-600', 'fa-bolt') + 
+                cardUI('MTTR Pessoal', m.mttr.toFixed(1)+'h', 'bg-purple-50', 'text-purple-600', 'fa-clock') +
+                cardUI('CSAT Pessoal', m.csat.toFixed(1), 'bg-yellow-50', 'text-yellow-600', 'fa-star');
+
+            const pendentes = dadosA.filter(d => !STATUS_ENCERRADOS.includes(d.Status)).sort((a,b) => new Date(a.Data) - new Date(b.Data));
+            document.getElementById('table-fila-analista').innerHTML = pendentes.length === 0 ? `<tr><td colspan="4" class="p-6 text-center text-slate-400 font-bold">Fila zerada!</td></tr>` : pendentes.map(d => `<tr class="border-b border-slate-100"><td class="px-4 py-3 font-mono font-bold text-blue-600 text-xs">${d.ID_Chamado}</td><td class="px-4 py-3 text-xs text-slate-500">${d.Data}</td><td class="px-4 py-3 text-[10px] font-bold">${d.Status}</td><td class="px-4 py-3 text-xs">${d.Motivo_Espera}</td></tr>`).join('');
+
+            const sem = [...new Set(dadosA.map(d => d.Semana))].sort();
+            const recA = sem.map(s => dadosA.filter(d => d.Semana === s).length);
+            const resA = sem.map(s => dadosA.filter(d => d.Semana === s && STATUS_ENCERRADOS.includes(d.Status)).length);
+
+            if(charts['cpA']) charts['cpA'].destroy();
+            charts['cpA'] = new Chart(document.getElementById('chartProdutividadeAnalista'), { type: 'bar', data: { labels: sem.map(s=>s.split(' - ')[1]), datasets: [{label: 'Entraram', data: recA, backgroundColor: '#e2e8f0'}, {label: 'Resolvidos', data: resA, backgroundColor: '#3b82f6'}] }, options: { maintainAspectRatio: false, scales: { y: { display: false } } } });
+
+            const motA = [...new Set(pendentes.map(d => d.Motivo_Espera))];
+            if(charts['cbA']) charts['cbA'].destroy();
+            charts['cbA'] = new Chart(document.getElementById('chartBacklogAnalista'), { type: 'doughnut', data: { labels: motA, datasets: [{ data: motA.map(m => pendentes.filter(d => d.Motivo_Espera === m).length), backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4'] }] }, options: { maintainAspectRatio: false, cutout: '60%' } });
+        }
+
+        function renderChartsGlobais() {
+            const mesesStr = [...new Set(rawData.map(d => d.Mes_Ano))].sort();
+            const volM = mesesStr.map(m => rawData.filter(d => d.Mes_Ano === m).length);
+            const slaM = mesesStr.map(m => { 
+                let resM = rawData.filter(d => d.Mes_Ano === m && STATUS_ENCERRADOS.includes(d.Status)); 
+                return resM.length ? (resM.filter(x => x.SLA_Cumprido === "Sim").length / resM.length) * 100 : 0; 
+            });
+
+            if(charts['ce']) charts['ce'].destroy();
+            charts['ce'] = new Chart(document.getElementById('chartEvolucao'), { type: 'line', data: { labels: mesesStr, datasets: [{ label: 'Volume', data: volM, type: 'bar', yAxisID: 'y', backgroundColor: '#e2e8f0', datalabels: {align: 'center'} }, { label: '% SLA', data: slaM, type: 'line', yAxisID: 'y1', borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.3, datalabels: {formatter: v=>v.toFixed(0)+'%', align:'top'} }] }, options: { maintainAspectRatio: false, scales: { y: { display: false }, y1: { display: false, max: 110 } } } });
+
+            const bk = filteredData.filter(d => !STATUS_ENCERRADOS.includes(d.Status));
+            const esp = [...new Set(bk.map(d => d.Motivo_Espera))];
+            if(charts['cesp']) charts['cesp'].destroy();
+            charts['cesp'] = new Chart(document.getElementById('chartEspera'), { type: 'pie', data: { labels: esp, datasets: [{ data: esp.map(e => bk.filter(d => d.Motivo_Espera === e).length), backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#64748b'] }] }, options: { maintainAspectRatio: false, plugins: { datalabels: { color: '#fff' } } } });
+
+            const res = filteredData.filter(d => STATUS_ENCERRADOS.includes(d.Status));
+            const cau = [...new Set(res.map(d => d.Causa_Raiz))].filter(c => c && c !== "Não classificado");
+            if(charts['ccr']) charts['ccr'].destroy();
+            charts['ccr'] = new Chart(document.getElementById('chartCausaRaiz'), { type: 'bar', data: { labels: cau, datasets: [{ data: cau.map(c => res.filter(d => d.Causa_Raiz === c).length), backgroundColor: '#10b981' }] }, options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { align: 'end', anchor: 'end' } }, scales: { x: { display: false } } } });
+        }
+
+        function renderTabelasGerais() {
+            const analistas = [...new Set(filteredData.map(d => d.Analista))].sort();
+            document.getElementById('table-comparativo-equipe').innerHTML = analistas.map(ana => {
+                let m = calcMetrics(filteredData.filter(d => d.Analista === ana));
+                return `<tr class="border-b border-slate-100"><td class="px-6 py-4 font-bold">${ana}</td><td class="px-6 py-4 text-center">${m.resolvidos}</td><td class="px-6 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-6 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-6 py-4 text-center">${m.fcrRate.toFixed(1)}%</td><td class="px-6 py-4 text-center">${m.mttr.toFixed(1)}h</td><td class="px-6 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td></tr>`;
+            }).join('');
+
+            const baseOrdenada = [...filteredData].sort((a, b) => {
+                const idA = parseInt(a.ID_Chamado.replace(/\D/g, ''));
+                const idB = parseInt(b.ID_Chamado.replace(/\D/g, ''));
+                return idB - idA;
+            });
+
+            document.getElementById('contador-base').innerText = `${baseOrdenada.length} chamados filtrados (de ${rawData.length} no total)`;
+
+            document.getElementById('table-base-body').innerHTML = baseOrdenada.map(d => `<tr class="border-b border-slate-100"><td class="px-4 py-2 text-xs font-mono text-blue-600">${d.ID_Chamado}</td><td class="px-4 py-2 text-xs">${d.Data}</td><td class="px-4 py-2 text-xs font-bold">${d.Analista}</td><td class="px-4 py-2 text-[10px] font-bold">${d.Status}</td><td class="px-4 py-2 text-xs">${d.Motivo_Espera}</td><td class="px-4 py-2 text-xs">${d.Causa_Raiz}</td><td class="px-4 py-2 text-xs text-center font-bold">${d.SLA_Cumprido}</td><td class="px-4 py-2 text-xs text-center">${d.FCR}</td></tr>`).join('');
+        }
+
+        function buildDeltaCard(t, vA, vB, format) {
+            let diff = vA - vB; let cor = diff === 0 ? 'text-slate-400' : (diff > 0 ? 'text-emerald-500' : 'text-red-500');
+            if(t.includes('MTTR') || t.includes('Volume') || t.includes('Backlog')) {
+                cor = diff === 0 ? 'text-slate-400' : (diff > 0 ? 'text-red-500' : 'text-emerald-500');
+            }
+            return `<div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-center shadow-sm"><p class="text-[10px] font-bold text-slate-500 mb-2 uppercase">${t}</p><div class="flex justify-center items-baseline gap-2"><h4 class="text-2xl font-black text-slate-800">${vA.toFixed(1)}${format}</h4><span class="text-xs font-bold ${cor}">${diff > 0 ? '+' : ''}${Math.abs(diff).toFixed(1)}${format==='%'?'pp':''}</span></div><p class="text-[10px] text-slate-400 mt-1">vs ${vB.toFixed(1)}${format}</p></div>`;
+        }
+
+        function calcularComparativos() {
+            if(document.getElementById('compMesA')) {
+                const mA = document.getElementById('compMesA').value; const mB = document.getElementById('compMesB').value;
+                const metA = calcMetrics(rawData.filter(d => d.Mes_Ano === mA)); const metB = calcMetrics(rawData.filter(d => d.Mes_Ano === mB));
+                document.getElementById('cards-delta-mensal').innerHTML = 
+                    buildDeltaCard('Volume', metA.recebidos, metB.recebidos, '') + 
+                    buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '') + 
+                    buildDeltaCard('SLA', metA.slaRate, metB.slaRate, '%') + 
+                    buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%') + 
+                    buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h') + 
+                    buildDeltaCard('CSAT', metA.csat, metB.csat, '');
+                
+                if(charts['ccm']) charts['ccm'].destroy();
+                charts['ccm'] = new Chart(document.getElementById('chartCompMensal'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Backlog Retido'], datasets: [{ label: mA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#3b82f6' }, { label: mB, data: [metB.recebidos, metB.resolvidos, metB.backlog], backgroundColor: '#cbd5e1' }] }, options: { maintainAspectRatio: false } });
+            }
+            
+            if(document.getElementById('compSemA')) {
+                const sA = document.getElementById('compSemA').value; const sB = document.getElementById('compSemB').value;
+                const mSA = calcMetrics(rawData.filter(d => d.Semana === sA)); const mSB = calcMetrics(rawData.filter(d => d.Semana === sB));
+                document.getElementById('cards-delta-semanal').innerHTML = 
+                    buildDeltaCard('Volume', mSA.recebidos, mSB.recebidos, '') + 
+                    buildDeltaCard('Resolvidos', mSA.resolvidos, mSB.resolvidos, '') + 
+                    buildDeltaCard('SLA', mSA.slaRate, mSB.slaRate, '%') + 
+                    buildDeltaCard('FCR', mSA.fcrRate, mSB.fcrRate, '%') + 
+                    buildDeltaCard('MTTR', mSA.mttr, mSB.mttr, 'h') + 
+                    buildDeltaCard('CSAT', mSA.csat, mSB.csat, '');
+            }
+        }
+
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(filteredData), "Base");
+            XLSX.writeFile(wb, `Extracao_Suporte_${new Date().getTime()}.xlsx`);
+        }
+    </script>
+</body>
+</html>
