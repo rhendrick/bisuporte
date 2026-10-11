@@ -317,6 +317,7 @@
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3 md:gap-4 mb-6" id="cards-analista"></div>
 
+                <!-- SEÇÃO EXCLUSIVA: CHAT & WHATSAPP (INDIVIDUAL) -->
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Operação de Chat & WhatsApp (Individual)
@@ -510,7 +511,6 @@
             sleep: ms => new Promise(r => setTimeout(r, ms)),
             
             get: async function(path, queryParams) {
-                // Encode seguro mantendo formatação OData limpa
                 const queryString = Object.entries(queryParams)
                     .map(([k,v]) => k + '=' + encodeURI(String(v)))
                     .join('&') + '&token=' + this.token;
@@ -682,31 +682,16 @@
         }
 
         function paraSegundos(valor) {
-            if (valor === null || valor === undefined || valor === "") return null;
-            if (typeof valor === "number") return valor;
-            
-            const strVal = String(valor).trim();
-            if (strVal === "") return null;
-            if (!isNaN(strVal)) return Number(strVal);
-
-            let dias = 0;
-            let tempoStr = strVal;
-            
-            if (strVal.includes(".")) {
-                const partesDia = strVal.split(".");
-                dias = Number(partesDia[0]);
-                tempoStr = partesDia[1];
-            }
-            if (tempoStr.includes(":")) {
-                const partes = tempoStr.split(":");
-                let secs = 0;
-                if (partes.length === 3) {
-                    secs = (Number(partes[0]) * 3600) + (Number(partes[1]) * 60) + Number(partes[2]);
-                } else if (partes.length === 2) {
-                    secs = (Number(partes[0]) * 60) + Number(partes[1]);
-                }
-                return (dias * 86400) + secs;
-            }
+            if (valor === null || valor === undefined) return null;
+            if (typeof valor === "number") return isFinite(valor) ? valor : null;
+            const s = String(valor).trim();
+            if (s === "") return null;
+            if (!isNaN(s)) return Number(s);
+            const frac = f => (f ? Number('0.' + f) : 0);
+            let m = s.match(/^(?:(\d+)\.)?(\d+):(\d{1,2}):(\d{1,2})(?:\.(\d+))?$/);
+            if (m) return (+(m[1] || 0)) * 86400 + (+m[2]) * 3600 + (+m[3]) * 60 + (+m[4]) + frac(m[5]);
+            m = s.match(/^(\d+):(\d{1,2})(?:\.(\d+))?$/);
+            if (m) return (+m[1]) * 60 + (+m[2]) + frac(m[3]);
             return null;
         }
 
@@ -811,11 +796,15 @@
 
             const hoje = new Date();
 
-            let countIsChat = 0;
-            let countEsperaPreenchida = 0;
-            let countTalkPreenchida = 0;
-            let sampleEspera = [];
-            let sampleTalk = [];
+            let diag = {
+                totalIsChat: 0,
+                brutoEspera: 0,
+                brutoTalk: 0,
+                convertidoEspera: 0,
+                convertidoTalk: 0,
+                naoConvertidos: [],
+                amostraChats: []
+            };
 
             const formatted = ticketsArray.map(ticket => {
                 const dataCriacao = new Date(ticket.createdDate);
@@ -872,18 +861,33 @@
                 }
 
                 let isChatOrWhats = (ticket.origin === 5 || ticket.origin === 6 || ticket.origin === 18 || ticket.origin === 23 || ticket.origin === 25);
-                if (isChatOrWhats) countIsChat++;
-
                 let esperaSeg = paraSegundos(ticket.chatWaitingTime);
                 let talkSeg = paraSegundos(ticket.chatTalkTime);
 
-                if (esperaSeg !== null) {
-                    countEsperaPreenchida++;
-                    if (sampleEspera.length < 3) sampleEspera.push(ticket.chatWaitingTime);
-                }
-                if (talkSeg !== null) {
-                    countTalkPreenchida++;
-                    if (sampleTalk.length < 3) sampleTalk.push(ticket.chatTalkTime);
+                if (isChatOrWhats) {
+                    diag.totalIsChat++;
+                    
+                    let wTime = ticket.chatWaitingTime;
+                    let tTime = ticket.chatTalkTime;
+                    
+                    let hasBrutoEspera = wTime !== null && wTime !== undefined && String(wTime).trim() !== "";
+                    let hasBrutoTalk = tTime !== null && tTime !== undefined && String(tTime).trim() !== "";
+                    
+                    if (hasBrutoEspera) diag.brutoEspera++;
+                    if (hasBrutoTalk) diag.brutoTalk++;
+                    if (esperaSeg !== null) diag.convertidoEspera++;
+                    if (talkSeg !== null) diag.convertidoTalk++;
+                    
+                    if (hasBrutoEspera && esperaSeg === null && diag.naoConvertidos.length < 5) {
+                        diag.naoConvertidos.push({ field: 'chatWaitingTime', value: wTime, type: typeof wTime });
+                    }
+                    if (hasBrutoTalk && talkSeg === null && diag.naoConvertidos.length < 5) {
+                        diag.naoConvertidos.push({ field: 'chatTalkTime', value: tTime, type: typeof tTime });
+                    }
+                    
+                    if (diag.amostraChats.length < 5) {
+                        diag.amostraChats.push({ id: ticket.id, origin: ticket.origin, chatWaitingTime: wTime, chatTalkTime: tTime });
+                    }
                 }
 
                 return {
@@ -926,13 +930,7 @@
                 };
             });
 
-            console.info("DIAGNOSTICO CHAT API:", {
-                totalIsChat: countIsChat,
-                temChatWaitingTime: countEsperaPreenchida,
-                temChatTalkTime: countTalkPreenchida,
-                sampleEsperaBruta: sampleEspera,
-                sampleTalkBruta: sampleTalk
-            });
+            console.info("DIAGNOSTICO CHAT API:", diag);
 
             return formatted;
         }
