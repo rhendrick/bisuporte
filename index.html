@@ -142,38 +142,37 @@
             <!-- TAB 1: VISÃO GERAL -->
             <div id="visao-geral" class="tab-content active space-y-6 w-full">
                 
-                <!-- SEÇÃO EXCLUSIVA: INDICADORES PRINCIPAIS (GLOBAL) -->
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-blue-600 text-base"></i> Indicadores Principais (Global)
                     </h3>
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4" id="cards-globais"></div>
                 </div>
 
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Operação de Chat & WhatsApp (Global)
                     </h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3" id="cards-chat-globais"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3" id="cards-chat-globais"></div>
                 </div>
 
                 <div class="grid charts-grid grid-cols-2 gap-4 md:gap-6 mb-6">
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
                         <h3 class="text-sm font-bold text-slate-800 mb-4 truncate">Tendência Operacional</h3>
                         <div class="relative min-h-[250px] md:h-72 w-full"><canvas id="chartEvolucao"></canvas></div>
                     </div>
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
                         <h3 class="text-sm font-bold text-slate-800 mb-4 truncate">Throughput (Entrada vs Saída)</h3>
                         <div class="relative min-h-[250px] md:h-72 w-full"><canvas id="chartProdutividadeGlobal"></canvas></div>
                     </div>
                 </div>
                 
                 <div class="grid charts-grid grid-cols-2 gap-4 md:gap-6 mb-6">
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
                         <h3 class="text-sm font-bold text-slate-800 mb-4 truncate">Gargalos do Backlog</h3>
                         <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartEspera"></canvas></div>
                     </div>
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
                         <h3 class="text-sm font-bold text-slate-800 mb-4 truncate">Canais de Origem</h3>
                         <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartOrigemGlobal"></canvas></div>
                     </div>
@@ -184,7 +183,7 @@
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCausaRaiz"></canvas></div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full print-break-inside">
                     <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50">
                         <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-500"></i> Fila de Pendências (Do Período Selecionado)</h3>
                         <p class="text-[10px] md:text-xs text-slate-500 mt-1">Visão gerencial dos tickets do período atual que ainda estão em aberto (Backlog Retido).</p>
@@ -227,7 +226,7 @@
                             <button id="btnRemoveAno" onclick="removePeriodo('Ano')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompAnual"></canvas></div>
                 </div>
 
@@ -246,7 +245,7 @@
                             <button id="btnRemoveSemestre" onclick="removePeriodo('Semestre')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemestral"></canvas></div>
                 </div>
 
@@ -265,7 +264,7 @@
                             <button id="btnRemoveMes" onclick="removePeriodo('Mes')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompMensal"></canvas></div>
                 </div>
 
@@ -284,7 +283,7 @@
                             <button id="btnRemoveSem" onclick="removePeriodo('Sem')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemanal"></canvas></div>
                 </div>
 
@@ -303,7 +302,7 @@
                             <button id="btnRemoveDia" onclick="removePeriodo('Dia')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompDiario"></canvas></div>
                 </div>
             </div>
@@ -321,19 +320,18 @@
                     <select id="selectAnalista" class="bg-slate-900 border border-slate-600 text-white rounded-lg p-2 md:p-3 text-sm font-bold outline-none focus:border-blue-500 w-full md:w-64" onchange="renderDashAnalista()"></select>
                 </div>
 
-                <!-- SEÇÃO EXCLUSIVA: INDICADORES PRINCIPAIS (INDIVIDUAL) -->
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-blue-600 text-base"></i> Indicadores Principais (Individual)
                     </h3>
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4" id="cards-analista"></div>
                 </div>
 
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Operação de Chat & WhatsApp (Individual)
                     </h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3" id="cards-chat-analista"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3" id="cards-chat-analista"></div>
                 </div>
 
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
@@ -427,38 +425,87 @@
 
             <!-- TAB 5: LEGENDA DE MÉTRICAS -->
             <div id="visao-legendas" class="tab-content w-full">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-8">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-8 print-break-inside">
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-2 border-b border-slate-100 pb-4">Dicionário de Indicadores</h2>
                     <p class="text-xs md:text-sm text-slate-500 mb-6 md:mb-8">Consulte o significado e o impacto de cada métrica acompanhada na gestão de suporte.</p>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-emerald-500">
-                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-bolt text-emerald-500"></i> FCR (First Contact Resolution)</h3>
-                            <p class="text-xs text-slate-500 mb-3">Mede a porcentagem de chamados resolvidos logo na primeira interação com o cliente sem reaberturas.</p>
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 px-1">Métricas Gerais</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8">
+                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-slate-800">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-inbox text-slate-800"></i> Volume</h3>
+                            <p class="text-xs text-slate-500 mb-3">Total de tickets recebidos no período (pela data de abertura), independentemente do status atual. Inclui os cancelados.</p>
                         </div>
-                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-yellow-400">
-                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-star text-yellow-400"></i> CSAT</h3>
-                            <p class="text-xs text-slate-500 mb-3">Índice de Satisfação do Cliente gerado pelas respostas das pesquisas pós-atendimento.</p>
+                        <div class="border border-teal-100 p-4 rounded-lg border-l-4 border-l-teal-600">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-check-double text-teal-600"></i> Resolvidos</h3>
+                            <p class="text-xs text-slate-500 mb-3">Total de tickets concluídos com sucesso no período. Ignora tickets cancelados.</p>
                         </div>
-                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-blue-500">
-                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-stopwatch text-blue-500"></i> SLA Médio</h3>
-                            <p class="text-xs text-slate-500 mb-3">Mede a porcentagem de chamados resolvidos DENTRO do prazo estipulado no contrato.</p>
+                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-slate-400">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-ban text-slate-500"></i> Cancelados</h3>
+                            <p class="text-xs text-slate-500 mb-3">Tickets invalidados antes da conclusão, contados pelo mês de abertura. Ficam fora de Resolvidos, Backlog, SLA, FCR, MTTR, CSAT e das métricas de chat, mas continuam somados no Volume. O analista exibido é o responsável atual do ticket, que pode não ser quem cancelou.</p>
                         </div>
-                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-red-700">
-                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-red-700"></i> SLA Violados</h3>
-                            <p class="text-xs text-slate-500 mb-3">Soma de todos os chamados que foram resolvidos com atraso MAIS os que ainda estão pendentes e já estouraram a data limite na safra selecionada.</p>
-                        </div>
-                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-orange-500">
+                        <div class="border border-orange-100 p-4 rounded-lg border-l-4 border-l-orange-500">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group text-orange-500"></i> Backlog Retido</h3>
-                            <p class="text-xs text-slate-500 mb-3">Dos tickets que ENTRARAM no período selecionado, quantos ainda estão pendentes (em aberto) na fila.</p>
+                            <p class="text-xs text-slate-500 mb-3">Dos tickets que ENTRARAM no período selecionado, mostra quantos ainda estão pendentes (em aberto) aguardando atendimento ou resposta.</p>
                         </div>
-                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-red-400">
+                        <div class="border border-red-100 p-4 rounded-lg border-l-4 border-l-red-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-calendar-days text-red-400"></i> Aging (Idade do Chamado)</h3>
-                            <p class="text-xs text-slate-500 mb-3">Mede há quantos dias os chamados pendentes (Backlog Retido) estão parados na fila. Revela gargalos daquele período.</p>
+                            <p class="text-xs text-slate-500 mb-3">Mede há quantos dias, em média, os chamados pendentes (Backlog Retido) estão parados na fila. Revela gargalos daquele período.</p>
                         </div>
-                        <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-purple-500">
+                        <div class="border border-emerald-100 p-4 rounded-lg border-l-4 border-l-emerald-500">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-bolt text-emerald-500"></i> FCR (First Contact Resolution)</h3>
+                            <p class="text-xs text-slate-500 mb-3">Porcentagem de chamados resolvidos no primeiro atendimento, conforme o campo 'resolvido no primeiro contato' do Movidesk.</p>
+                        </div>
+                        <div class="border border-blue-100 p-4 rounded-lg border-l-4 border-l-blue-500">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-stopwatch text-blue-500"></i> SLA Médio</h3>
+                            <p class="text-xs text-slate-500 mb-3">Porcentagem de chamados resolvidos dentro do prazo do contrato. Chamados sem contrato/SLA não entram na conta.</p>
+                        </div>
+                        <div class="border border-red-200 p-4 rounded-lg border-l-4 border-l-red-700">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-red-700"></i> SLA Violados</h3>
+                            <p class="text-xs text-slate-500 mb-3">Soma dos chamados resolvidos com atraso MAIS os que ainda estão pendentes e já estouraram a data limite na safra selecionada.</p>
+                        </div>
+                        <div class="border border-purple-100 p-4 rounded-lg border-l-4 border-l-purple-500">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-purple-500"></i> MTTR</h3>
-                            <p class="text-xs text-slate-500 mb-3">Tempo Médio de Resolução. Horas reais decorridas entre a abertura do chamado e o encerramento.</p>
+                            <p class="text-xs text-slate-500 mb-3">Tempo Médio de Resolução. Horas reais decorridas entre a abertura do chamado e o seu encerramento.</p>
+                        </div>
+                        <div class="border border-yellow-100 p-4 rounded-lg border-l-4 border-l-yellow-400">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-star text-yellow-400"></i> CSAT</h3>
+                            <p class="text-xs text-slate-500 mb-3">Índice médio de Satisfação do Cliente, gerado pelas respostas das pesquisas pós-atendimento.</p>
+                        </div>
+                        <div class="border border-amber-100 p-4 rounded-lg border-l-4 border-l-amber-500">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-amber-500"></i> Aderência CSAT</h3>
+                            <p class="text-xs text-slate-500 mb-3">Percentual de tickets resolvidos no período que receberam avaliação do cliente, exibido também como 'x de y resolvidos'. Mede o engajamento e a validade estatística da nota CSAT.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 px-1 border-t border-slate-100 pt-6">Métricas de Chat & WhatsApp</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        <div class="border border-emerald-100 p-4 rounded-lg border-l-4 border-l-emerald-500 bg-emerald-50/30">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-brands fa-whatsapp text-emerald-600"></i> Chats Atendidos</h3>
+                            <p class="text-xs text-slate-500 mb-3">Chamados abertos pelos canais Chat Online, Chat Offline, WhatsApp, WhatsApp Business e WhatsApp Ativo no período, exceto cancelados.</p>
+                        </div>
+                        <div class="border border-emerald-100 p-4 rounded-lg border-l-4 border-l-emerald-500 bg-emerald-50/30">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-check-double text-emerald-600"></i> Resolvidos 1º Atend.</h3>
+                            <p class="text-xs text-slate-500 mb-3">Chats resolvidos no primeiro atendimento, conforme o campo do Movidesk.</p>
+                        </div>
+                        <div class="border border-emerald-100 p-4 rounded-lg border-l-4 border-l-emerald-500 bg-emerald-50/30">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-clock text-emerald-600"></i> Não resolv. no 1º atend.</h3>
+                            <p class="text-xs text-slate-500 mb-3">Chats que não foram resolvidos no primeiro atendimento: ainda pendentes ou resolvidos depois.</p>
+                        </div>
+                        <div class="border border-emerald-100 p-4 rounded-lg border-l-4 border-l-emerald-500 bg-emerald-50/30">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-moon text-emerald-600"></i> Chats Offline</h3>
+                            <p class="text-xs text-slate-500 mb-3">Mensagens geradas através do widget de chat fora do horário comercial ou quando nenhum analista estava logado.</p>
+                        </div>
+                        <div class="border border-emerald-100 p-4 rounded-lg border-l-4 border-l-emerald-500 bg-emerald-50/30">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-ban text-emerald-600"></i> Chats Cancelados</h3>
+                            <p class="text-xs text-slate-500 mb-3">Chats invalidados antes da conclusão. Não entram nas demais métricas de chat.</p>
+                        </div>
+                        <div class="border border-emerald-100 p-4 rounded-lg border-l-4 border-l-emerald-500 bg-emerald-50/30">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-stopwatch text-emerald-600"></i> Tempos de Duração</h3>
+                            <p class="text-xs text-slate-500 mb-3">Duração da conversa de chat (campo chatTalkTime do Movidesk). Média e maior valor consideram só os chats que têm esse dado, indicado em 'n='.</p>
+                        </div>
+                        <div class="border border-emerald-100 p-4 rounded-lg border-l-4 border-l-emerald-500 bg-emerald-50/30">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-hourglass-half text-emerald-600"></i> Tempos de Espera (Fila)</h3>
+                            <p class="text-xs text-slate-500 mb-3">Tempo que o cliente ficou na fila do chat (campo chatWaitingTime do Movidesk). Média e maior valor consideram só os chats que têm esse dado, indicado em 'n='.</p>
                         </div>
                     </div>
                 </div>
@@ -471,7 +518,7 @@
         // CHAVE DA API MOVIDESK E FUNÇÕES GLOBAIS
         // ==============================================================================
         const MOVIDESK_TOKEN = "88599593-1148-4b69-89ca-b4a2c55623aa"; 
-        const META_ADERENCIA_CSAT = null; // Configure aqui a sua meta. Ex: 30
+        const META_ADERENCIA_CSAT = null; 
 
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
@@ -626,10 +673,10 @@
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v25') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v27') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v25');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v27');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -659,7 +706,7 @@
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v25', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v27', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
@@ -671,9 +718,6 @@
             }
         }
 
-        // ==============================================================================
-        // MÓDULO DE FUSO HORÁRIO E TEMPO (CONVERSORES LOCAIS DE PRECISÃO)
-        // ==============================================================================
         const padStr = n => String(n).padStart(2, '0');
         const getLocalIsoDate = (d) => `${d.getFullYear()}-${padStr(d.getMonth() + 1)}-${padStr(d.getDate())}`;
         const getLocalIsoMonth = (d) => `${d.getFullYear()}-${padStr(d.getMonth() + 1)}`;
@@ -719,8 +763,6 @@
             if (mins > 0) return `${mins}min ${segs}seg`;
             return `${segs}seg`;
         }
-
-        // ==============================================================================
 
         function renderBadgeSla(status) {
             if(status === 'Violado') return `<span class="bg-red-100 text-red-700 font-bold px-2 py-1 rounded text-[9px] md:text-[10px] uppercase border border-red-200 whitespace-nowrap">Violado</span>`;
@@ -1238,11 +1280,12 @@
             const csatBase = baseResolvidos.length;
             const csatAderencia = csatBase > 0 ? (csatRespondidos / csatBase) * 100 : 0;
 
-            const chatsDataset = baseRecebidos.filter(d => d.Is_Chat);
+            const chatsDataset = baseRecebidos.filter(d => d.Is_Chat && d.BaseStatus !== "Canceled");
             const chatsAtendidos = chatsDataset.length;
             const chatsResolvidosPrimeiro = chatsDataset.filter(d => d.FCR === "Sim" && d.IsResolvido).length;
             const chatsNaoResolvidos = chatsAtendidos - chatsResolvidosPrimeiro;
             const chatsOffline = chatsDataset.filter(d => d.Chat_Offline).length;
+            const chatsCancelados = baseRecebidos.filter(d => d.Is_Chat && d.BaseStatus === "Canceled").length;
 
             const chatsComDuracao = chatsDataset.filter(d => d.Chat_Duracao_Seg !== null);
             const nDuracao = chatsComDuracao.length;
@@ -1262,6 +1305,7 @@
                     resolvidosPrimeiro: chatsResolvidosPrimeiro,
                     naoResolvidos: chatsNaoResolvidos,
                     offline: chatsOffline,
+                    cancelados: chatsCancelados,
                     maiorDuracao: formatarTempo(maxDuracaoSeg),
                     nDuracao: nDuracao,
                     mediaDuracao: formatarTempo(mediaDuracaoSeg),
@@ -1309,6 +1353,7 @@
                 buildChatCardUI('Resolvidos 1º Atend.', m.chat.resolvidosPrimeiro) +
                 buildChatCardUI('Não resolv. no 1º atend.', m.chat.naoResolvidos) +
                 buildChatCardUI('Chats Offline', m.chat.offline) +
+                buildChatCardUI('Chats Cancelados', m.chat.cancelados) +
                 buildChatCardUI('Maior Duração', m.chat.maiorDuracao, m.chat.nDuracao) +
                 buildChatCardUI('Tempo Médio Duração', m.chat.mediaDuracao, m.chat.nDuracao) +
                 buildChatCardUI('Maior Espera Fila', m.chat.maiorEspera, m.chat.nEspera) +
@@ -1356,6 +1401,7 @@
                 buildChatCardUI('Resolvidos 1º Atend.', m.chat.resolvidosPrimeiro) +
                 buildChatCardUI('Não resolv. no 1º atend.', m.chat.naoResolvidos) +
                 buildChatCardUI('Chats Offline', m.chat.offline) +
+                buildChatCardUI('Chats Cancelados', m.chat.cancelados) +
                 buildChatCardUI('Maior Duração', m.chat.maiorDuracao, m.chat.nDuracao) +
                 buildChatCardUI('Tempo Médio Duração', m.chat.mediaDuracao, m.chat.nDuracao) +
                 buildChatCardUI('Maior Espera Fila', m.chat.maiorEspera, m.chat.nEspera) +
