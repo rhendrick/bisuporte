@@ -135,16 +135,22 @@
                 </div>
             </div>
 
-            <!-- AVISO CSAT -->
             <div id="csat-warning" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-3 text-sm font-bold text-center print-hide mb-4 shadow-sm">
                 CSAT indisponível: Erro ao buscar dados na API.
             </div>
 
             <!-- TAB 1: VISÃO GERAL -->
             <div id="visao-geral" class="tab-content active space-y-6 w-full">
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3 md:gap-4 mb-2" id="cards-globais"></div>
+                
+                <!-- SEÇÃO EXCLUSIVA: INDICADORES PRINCIPAIS (GLOBAL) -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-blue-600 text-base"></i> Indicadores Principais (Global)
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4" id="cards-globais"></div>
+                </div>
 
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Operação de Chat & WhatsApp (Global)
                     </h3>
@@ -315,9 +321,14 @@
                     <select id="selectAnalista" class="bg-slate-900 border border-slate-600 text-white rounded-lg p-2 md:p-3 text-sm font-bold outline-none focus:border-blue-500 w-full md:w-64" onchange="renderDashAnalista()"></select>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3 md:gap-4 mb-6" id="cards-analista"></div>
+                <!-- SEÇÃO EXCLUSIVA: INDICADORES PRINCIPAIS (INDIVIDUAL) -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-blue-600 text-base"></i> Indicadores Principais (Individual)
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4" id="cards-analista"></div>
+                </div>
 
-                <!-- SEÇÃO EXCLUSIVA: CHAT & WHATSAPP (INDIVIDUAL) -->
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Operação de Chat & WhatsApp (Individual)
@@ -369,7 +380,7 @@
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto scrollbar-thin">
                         <table class="w-full text-sm text-left whitespace-nowrap">
                             <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b">
-                                <tr><th class="px-4 md:px-6 py-4">Analista</th><th class="px-4 py-4 text-center">Resolvidos</th><th class="px-4 py-4 text-center">Backlog Retido</th><th class="px-4 py-4 text-center">Aging Médio</th><th class="px-4 py-4 text-center">SLA Média</th><th class="px-4 py-4 text-center">SLA Violado</th><th class="px-4 py-4 text-center">FCR</th><th class="px-4 py-4 text-center">MTTR Médio</th><th class="px-4 py-4 text-center">CSAT</th></tr>
+                                <tr><th class="px-4 md:px-6 py-4">Analista</th><th class="px-4 py-4 text-center">Resolvidos</th><th class="px-4 py-4 text-center">Backlog Retido</th><th class="px-4 py-4 text-center">Aging Médio</th><th class="px-4 py-4 text-center">SLA Média</th><th class="px-4 py-4 text-center">SLA Violado</th><th class="px-4 py-4 text-center">FCR</th><th class="px-4 py-4 text-center">MTTR Médio</th><th class="px-4 py-4 text-center">CSAT</th><th class="px-4 py-4 text-center">Aderência CSAT</th></tr>
                             </thead>
                             <tbody id="table-comparativo-equipe" class="divide-y divide-slate-100"></tbody>
                         </table>
@@ -457,9 +468,10 @@
 
     <script>
         // ==============================================================================
-        // CHAVE DA API MOVIDESK E FUNÇÕES DE SEGURANÇA (XSS PREVENTION)
+        // CHAVE DA API MOVIDESK E FUNÇÕES GLOBAIS
         // ==============================================================================
         const MOVIDESK_TOKEN = "88599593-1148-4b69-89ca-b4a2c55623aa"; 
+        const META_ADERENCIA_CSAT = null; // Configure aqui a sua meta. Ex: 30
 
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
@@ -725,27 +737,30 @@
 
         function getCardConfig(type) {
             const map = {
-                'Volume':       {bg: 'bg-slate-50',   txt: 'text-slate-800',   ic: 'fa-inbox'},
-                'Resolvidos':   {bg: 'bg-teal-50',    txt: 'text-teal-600',    ic: 'fa-check-double'},
-                'Cancelados':   {bg: 'bg-slate-100',  txt: 'text-slate-500',   ic: 'fa-ban'},
-                'Backlog':      {bg: 'bg-orange-50',  txt: 'text-orange-600',  ic: 'fa-layer-group'},
-                'Aging':        {bg: 'bg-red-50',     txt: 'text-red-500',     ic: 'fa-calendar-days'},
-                'SLA Violado':  {bg: 'bg-red-100',    txt: 'text-red-700',     ic: 'fa-triangle-exclamation'},
-                'SLA Média':    {bg: 'bg-blue-50',    txt: 'text-blue-600',    ic: 'fa-stopwatch'},
-                'FCR':          {bg: 'bg-emerald-50', txt: 'text-emerald-600', ic: 'fa-bolt'},
-                'MTTR':         {bg: 'bg-purple-50',  txt: 'text-purple-600',  ic: 'fa-clock-rotate-left'},
-                'CSAT':         {bg: 'bg-yellow-50',  txt: 'text-yellow-600',  ic: 'fa-star'}
+                'Volume':       {bg: 'bg-slate-50',   txt: 'text-slate-800',   ic: 'fa-inbox', bd: 'border-slate-200'},
+                'Resolvidos':   {bg: 'bg-teal-50',    txt: 'text-teal-600',    ic: 'fa-check-double', bd: 'border-teal-100'},
+                'Cancelados':   {bg: 'bg-slate-100',  txt: 'text-slate-500',   ic: 'fa-ban', bd: 'border-slate-200'},
+                'Backlog':      {bg: 'bg-orange-50',  txt: 'text-orange-600',  ic: 'fa-layer-group', bd: 'border-orange-100'},
+                'Aging':        {bg: 'bg-red-50',     txt: 'text-red-500',     ic: 'fa-calendar-days', bd: 'border-red-100'},
+                'SLA Violado':  {bg: 'bg-red-100',    txt: 'text-red-700',     ic: 'fa-triangle-exclamation', bd: 'border-red-200'},
+                'SLA Média':    {bg: 'bg-blue-50',    txt: 'text-blue-600',    ic: 'fa-stopwatch', bd: 'border-blue-100'},
+                'FCR':          {bg: 'bg-emerald-50', txt: 'text-emerald-600', ic: 'fa-bolt', bd: 'border-emerald-100'},
+                'MTTR':         {bg: 'bg-purple-50',  txt: 'text-purple-600',  ic: 'fa-clock-rotate-left', bd: 'border-purple-100'},
+                'CSAT':         {bg: 'bg-yellow-50',  txt: 'text-yellow-600',  ic: 'fa-star', bd: 'border-yellow-100'},
+                'Aderência CSAT': {bg: 'bg-amber-50', txt: 'text-amber-600',   ic: 'fa-clipboard-check', bd: 'border-amber-100'}
             };
             return map[type] || map['Volume'];
         }
 
-        function buildCardUI(tit, val, typeConfig) {
-            return `<div class="${typeConfig.bg} border border-slate-200 p-3 md:p-4 rounded-xl flex flex-col justify-center min-h-[80px] shadow-sm hover:shadow-md transition">
+        function buildCardUI(tit, val, typeConfig, sub = null) {
+            let subTexto = sub ? `<p class="text-[9px] text-slate-400 mt-1">${sub}</p>` : "";
+            return `<div class="${typeConfig.bg} border ${typeConfig.bd || 'border-slate-200'} p-3 md:p-4 rounded-xl flex flex-col justify-center min-h-[80px] shadow-sm hover:shadow-md transition">
                         <div class="flex justify-between items-start mb-1 md:mb-2 gap-1">
                             <p class="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase leading-tight">${tit}</p>
                             <i class="fa-solid ${typeConfig.ic} ${typeConfig.txt} opacity-50 text-sm md:text-base shrink-0"></i>
                         </div>
                         <h3 class="text-xl md:text-2xl font-black ${typeConfig.txt}">${val}</h3>
+                        ${subTexto}
                     </div>`;
         }
 
@@ -771,7 +786,7 @@
             let diffStr = diff === 0 ? '0.0' : sign + Math.abs(diff).toFixed(1);
             if(format === '%') diffStr += 'pp';
 
-            return `<div class="${typeConfig.bg} border border-slate-200 p-3 md:p-4 rounded-xl flex flex-col justify-center min-h-[80px] shadow-sm hover:shadow-md transition">
+            return `<div class="${typeConfig.bg} border ${typeConfig.bd || 'border-slate-200'} p-3 md:p-4 rounded-xl flex flex-col justify-center min-h-[80px] shadow-sm hover:shadow-md transition">
                         <div class="flex justify-between items-start mb-1 md:mb-2 gap-1">
                             <p class="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase leading-tight">${t}</p>
                             <i class="fa-solid ${typeConfig.ic} ${typeConfig.txt} opacity-50 text-sm md:text-base shrink-0"></i>
@@ -922,6 +937,7 @@
                     "MTTR_Horas": mttrHoras,
                     "Aging_Dias": agingDias,
                     "CSAT": notasCsatMapeadas[ticket.id] || 0,
+                    "CSAT_Respondido": Object.prototype.hasOwnProperty.call(notasCsatMapeadas, ticket.id),
                     
                     "Is_Chat": isChatOrWhats,
                     "Chat_Espera_Seg": esperaSeg,
@@ -1214,9 +1230,14 @@
             
             const fcrRate = resolvidos > 0 ? (baseResolvidos.filter(d => d.FCR === "Sim").length / resolvidos) * 100 : 0;
             const mttr = resolvidos > 0 ? baseResolvidos.reduce((s, d) => s + d.MTTR_Horas, 0) / resolvidos : 0;
+            
             const csatArr = baseResolvidos.filter(d => d.CSAT > 0);
             const csat = csatArr.length > 0 ? csatArr.reduce((s, d) => s + d.CSAT, 0) / csatArr.length : 0;
             
+            const csatRespondidos = baseResolvidos.filter(d => d.CSAT_Respondido).length;
+            const csatBase = baseResolvidos.length;
+            const csatAderencia = csatBase > 0 ? (csatRespondidos / csatBase) * 100 : 0;
+
             const chatsDataset = baseRecebidos.filter(d => d.Is_Chat);
             const chatsAtendidos = chatsDataset.length;
             const chatsResolvidosPrimeiro = chatsDataset.filter(d => d.FCR === "Sim" && d.IsResolvido).length;
@@ -1234,7 +1255,8 @@
             const mediaEsperaSeg = nEspera > 0 ? (chatsComEspera.reduce((s, d) => s + d.Chat_Espera_Seg, 0) / nEspera) : null;
 
             return { 
-                recebidos, cancelados, backlog: pendentes.length, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, csat,
+                recebidos, cancelados, backlog: pendentes.length, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, 
+                csat, csatRespondidos, csatBase, csatAderencia,
                 chat: {
                     atendidos: chatsAtendidos,
                     resolvidosPrimeiro: chatsResolvidosPrimeiro,
@@ -1255,6 +1277,20 @@
             const dia = document.getElementById('filterDia').value;
             const m = calcMetrics(rawData, mes, dia);
 
+            const csatFailed = !document.getElementById('csat-warning').classList.contains('hidden');
+            let aderenciaVal = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
+            let aderenciaSub = csatFailed ? 'sem dados' : `${m.csatRespondidos} de ${m.csatBase} resolvidos`;
+            let aderenciaConfig = { ...getCardConfig('Aderência CSAT') };
+            
+            if (!csatFailed && META_ADERENCIA_CSAT !== null) {
+                aderenciaSub += ` | Meta: ${META_ADERENCIA_CSAT}%`;
+                if (m.csatAderencia >= META_ADERENCIA_CSAT) {
+                    aderenciaConfig.txt = 'text-emerald-600';
+                } else {
+                    aderenciaConfig.txt = 'text-red-600';
+                }
+            }
+
             document.getElementById('cards-globais').innerHTML = 
                 buildCardUI('Volume', m.recebidos, getCardConfig('Volume')) +
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
@@ -1265,7 +1301,8 @@
                 buildCardUI('SLA Médio', m.slaRate.toFixed(1)+'%', getCardConfig('SLA Média')) +
                 buildCardUI('FCR', m.fcrRate.toFixed(1)+'%', getCardConfig('FCR')) +
                 buildCardUI('MTTR', m.mttr.toFixed(1)+'h', getCardConfig('MTTR')) +
-                buildCardUI('CSAT', m.csat.toFixed(1), getCardConfig('CSAT'));
+                buildCardUI('CSAT', m.csat.toFixed(1), getCardConfig('CSAT')) +
+                buildCardUI('Aderência CSAT', aderenciaVal, aderenciaConfig, aderenciaSub);
 
             document.getElementById('cards-chat-globais').innerHTML = 
                 buildChatCardUI('Chats Atendidos', m.chat.atendidos) +
@@ -1288,6 +1325,20 @@
             const dadosA = rawData.filter(d => d.Analista === analistaSel);
             const m = calcMetrics(dadosA, mes, dia);
 
+            const csatFailed = !document.getElementById('csat-warning').classList.contains('hidden');
+            let aderenciaVal = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
+            let aderenciaSub = csatFailed ? 'sem dados' : `${m.csatRespondidos} de ${m.csatBase} resolvidos`;
+            let aderenciaConfig = { ...getCardConfig('Aderência CSAT') };
+            
+            if (!csatFailed && META_ADERENCIA_CSAT !== null) {
+                aderenciaSub += ` | Meta: ${META_ADERENCIA_CSAT}%`;
+                if (m.csatAderencia >= META_ADERENCIA_CSAT) {
+                    aderenciaConfig.txt = 'text-emerald-600';
+                } else {
+                    aderenciaConfig.txt = 'text-red-600';
+                }
+            }
+
             document.getElementById('cards-analista').innerHTML = 
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
                 buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
@@ -1297,7 +1348,8 @@
                 buildCardUI('SLA Médio', m.slaRate.toFixed(1)+'%', getCardConfig('SLA Média')) +
                 buildCardUI('FCR', m.fcrRate.toFixed(1)+'%', getCardConfig('FCR')) +
                 buildCardUI('MTTR', m.mttr.toFixed(1)+'h', getCardConfig('MTTR')) +
-                buildCardUI('CSAT', m.csat.toFixed(1), getCardConfig('CSAT'));
+                buildCardUI('CSAT', m.csat.toFixed(1), getCardConfig('CSAT')) +
+                buildCardUI('Aderência CSAT', aderenciaVal, aderenciaConfig, aderenciaSub);
 
             document.getElementById('cards-chat-analista').innerHTML = 
                 buildChatCardUI('Chats Atendidos', m.chat.atendidos) +
@@ -1409,10 +1461,14 @@
             const analistas = [...new Set(rawData.map(d => d.Analista))].sort();
             const mes = document.getElementById('filterMes').value;
             const dia = document.getElementById('filterDia').value;
+            const csatFailed = !document.getElementById('csat-warning').classList.contains('hidden');
 
             document.getElementById('table-comparativo-equipe').innerHTML = analistas.map(ana => {
                 let m = calcMetrics(rawData.filter(d => d.Analista === ana), mes, dia);
-                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td></tr>`;
+                let csatAdFormat = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
+                let csatAdSub = csatFailed ? '' : `<br><span class="text-[9px] text-slate-400">${m.csatRespondidos}/${m.csatBase}</span>`;
+                
+                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td><td class="px-4 py-4 text-center font-bold text-amber-600">${csatAdFormat}${csatAdSub}</td></tr>`;
             }).join('');
 
             const baseOrdenada = [...filteredData].sort((a, b) => {
@@ -1466,7 +1522,8 @@
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
                     buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
                     buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT'));
+                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsAno = [
                     { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#ef4444' }, 
@@ -1499,7 +1556,8 @@
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
                     buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
                     buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT'));
+                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsSemestre = [
                     { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#f97316' }, 
@@ -1532,7 +1590,8 @@
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
                     buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
                     buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT'));
+                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsMes = [
                     { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#3b82f6' }, 
@@ -1565,7 +1624,8 @@
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
                     buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
                     buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT'));
+                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
 
                 let dsSemana = [
                     { label: getLabelGrafico(valA, 'Sem'), data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#8b5cf6' }, 
@@ -1598,7 +1658,8 @@
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
                     buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
                     buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT'));
+                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
 
                 let dsDia = [
                     { label: getLabelGrafico(valA, 'Dia'), data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#f59e0b' }, 
