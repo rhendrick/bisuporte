@@ -139,7 +139,6 @@
             <div id="visao-geral" class="tab-content active space-y-6 w-full">
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3 md:gap-4 mb-2" id="cards-globais"></div>
 
-                <!-- SEÇÃO EXCLUSIVA: CHAT & WHATSAPP (GLOBAL) -->
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Operação de Chat & WhatsApp (Global)
@@ -176,8 +175,8 @@
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full">
                     <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50">
-                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-500"></i> Fila de Pendências Global</h3>
-                        <p class="text-[10px] md:text-xs text-slate-500 mt-1">Visão gerencial de tickets abertos (Priorizados pelo Aging).</p>
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-500"></i> Fila de Pendências (Do Período Selecionado)</h3>
+                        <p class="text-[10px] md:text-xs text-slate-500 mt-1">Visão gerencial dos tickets do período atual que ainda estão em aberto (Backlog Retido).</p>
                     </div>
                     <div class="overflow-x-auto table-container scrollbar-thin">
                         <table class="w-full text-sm text-left whitespace-nowrap">
@@ -305,7 +304,7 @@
                         <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-500 rounded-full flex items-center justify-center text-lg md:text-xl font-bold"><i class="fa-solid fa-user-astronaut"></i></div>
                         <div>
                             <h2 class="text-lg md:text-xl font-bold tracking-wide">Painel do Analista</h2>
-                            <p class="text-xs md:text-sm text-slate-400">Escolha para ver fila individual.</p>
+                            <p class="text-xs md:text-sm text-slate-400">Escolha para ver a performance individual.</p>
                         </div>
                     </div>
                     <select id="selectAnalista" class="bg-slate-900 border border-slate-600 text-white rounded-lg p-2 md:p-3 text-sm font-bold outline-none focus:border-blue-500 w-full md:w-64" onchange="renderDashAnalista()"></select>
@@ -340,6 +339,7 @@
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8 w-full print-break-inside">
                     <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50">
                         <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-500"></i> Minha Fila de Pendências</h3>
+                        <p class="text-[10px] md:text-xs text-slate-500 mt-1">Apenas tickets do período selecionado.</p>
                     </div>
                     <div class="overflow-x-auto table-container scrollbar-thin">
                         <table class="w-full text-sm text-left whitespace-nowrap">
@@ -364,7 +364,7 @@
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto scrollbar-thin">
                         <table class="w-full text-sm text-left whitespace-nowrap">
                             <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b">
-                                <tr><th class="px-4 md:px-6 py-4">Analista</th><th class="px-4 py-4 text-center">Resolvidos</th><th class="px-4 py-4 text-center">Backlog</th><th class="px-4 py-4 text-center">Aging Médio</th><th class="px-4 py-4 text-center">SLA Média</th><th class="px-4 py-4 text-center">SLA Violado</th><th class="px-4 py-4 text-center">FCR</th><th class="px-4 py-4 text-center">MTTR Médio</th><th class="px-4 py-4 text-center">CSAT</th></tr>
+                                <tr><th class="px-4 md:px-6 py-4">Analista</th><th class="px-4 py-4 text-center">Resolvidos</th><th class="px-4 py-4 text-center">Backlog Retido</th><th class="px-4 py-4 text-center">Aging Médio</th><th class="px-4 py-4 text-center">SLA Média</th><th class="px-4 py-4 text-center">SLA Violado</th><th class="px-4 py-4 text-center">FCR</th><th class="px-4 py-4 text-center">MTTR Médio</th><th class="px-4 py-4 text-center">CSAT</th></tr>
                             </thead>
                             <tbody id="table-comparativo-equipe" class="divide-y divide-slate-100"></tbody>
                         </table>
@@ -430,15 +430,15 @@
                         </div>
                         <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-red-700">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-red-700"></i> SLA Violados</h3>
-                            <p class="text-xs text-slate-500 mb-3">Soma de todos os chamados que já estouraram a data limite (tanto resolvidos atrasados quanto pendentes).</p>
+                            <p class="text-xs text-slate-500 mb-3">Soma de todos os chamados que foram resolvidos com atraso MAIS os que ainda estão pendentes e já estouraram a data limite na safra selecionada.</p>
                         </div>
                         <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-orange-500">
-                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group text-orange-500"></i> Backlog</h3>
-                            <p class="text-xs text-slate-500 mb-3">Volume de tickets em aberto na fila, aguardando qualquer tipo de atuação da equipe.</p>
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group text-orange-500"></i> Backlog Retido</h3>
+                            <p class="text-xs text-slate-500 mb-3">Dos tickets que ENTRARAM no período selecionado, quantos ainda estão pendentes (em aberto) na fila.</p>
                         </div>
                         <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-red-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-calendar-days text-red-400"></i> Aging (Idade do Chamado)</h3>
-                            <p class="text-xs text-slate-500 mb-3">Mede há quantos dias os chamados pendentes (Backlog) estão parados na fila. Revela gargalos antigos.</p>
+                            <p class="text-xs text-slate-500 mb-3">Mede há quantos dias os chamados pendentes (Backlog Retido) estão parados na fila. Revela gargalos daquele período.</p>
                         </div>
                         <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-purple-500">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-purple-500"></i> MTTR</h3>
@@ -452,9 +452,17 @@
 
     <script>
         // ==============================================================================
-        // CHAVE DA API MOVIDESK
+        // CHAVE DA API MOVIDESK E FUNÇÕES DE SEGURANÇA (XSS PREVENTION)
         // ==============================================================================
         const MOVIDESK_TOKEN = "88599593-1148-4b69-89ca-b4a2c55623aa"; 
+
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>'"]/g, function(tag) {
+                const charsToReplace = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
+                return charsToReplace[tag] || tag;
+            });
+        }
 
         Chart.register(ChartDataLabels);
         Chart.defaults.font.family = 'Inter';
@@ -522,11 +530,12 @@
                                 retries++;
                                 continue;
                             }
-                            throw new Error(`HTTP ${response.status}`);
+                            const errText = await response.text().catch(() => 'Sem detalhes disponíveis');
+                            throw new Error(`HTTP ${response.status} - ${errText}`);
                         }
                         return await response.json();
                     } catch (error) {
-                        if (error.name === 'TypeError') throw new Error("Falha de rede ou CORS.");
+                        if (error.name === 'TypeError') throw new Error("Falha de rede ou bloqueio CORS.");
                         throw error;
                     }
                 }
@@ -541,57 +550,26 @@
                 const odataFilter = `createdDate ge ${dataIso} or resolvedIn ge ${dataIso} or baseStatus eq 'New' or baseStatus eq 'InAttendance' or baseStatus eq 'Stopped'`;
 
                 while(hasMore) {
-                    this.updateProgress(`Buscando tickets... ${allTickets.length} carregados`);
+                    this.updateProgress(`Buscando tickets e tempos nativos... ${allTickets.length} carregados`);
                     const data = await this.get('/tickets', {
-                        '$select': 'id,createdDate,resolvedIn,status,baseStatus,category,justification,resolvedInFirstCall,slaSolutionDate,origin,urgency',
+                        '$select': 'id,createdDate,resolvedIn,status,baseStatus,category,justification,resolvedInFirstCall,slaSolutionDate,origin,urgency,chatWaitingTime,chatTalkTime',
                         '$expand': 'owner($select=businessName),clients($select=businessName,organization;$expand=organization($select=businessName))',
                         '$filter': odataFilter,
                         '$orderby': 'id desc',
-                        '$top': 50,
+                        '$top': 100,
                         '$skip': skip
                     });
                     if(!Array.isArray(data)) throw new Error("A resposta da API de tickets falhou.");
                     allTickets = allTickets.concat(data);
-                    if(data.length < 50) hasMore = false;
+                    
+                    if(data.length < 100) hasMore = false;
                     else {
-                        skip += 50;
+                        skip += 100;
                         this.updateProgress("Pausa de segurança (8s) para alívio do servidor...");
                         await this.sleep(8000);
                     }
                 }
                 return allTickets;
-            },
-
-            getChats: async function(dateStr) {
-                let allChats = [];
-                let skip = 0;
-                let hasMore = true;
-
-                while(hasMore) {
-                    this.updateProgress(`Buscando histórico de Chats... ${allChats.length} processados`);
-                    try {
-                        // Tenta buscar na API de chats do Movidesk
-                        const data = await this.get('/chats', {
-                            '$filter': `chatDate ge ${dateStr}`,
-                            '$top': 100,
-                            '$skip': skip
-                        });
-                        if (Array.isArray(data) && data.length > 0) {
-                            allChats = allChats.concat(data);
-                            if (data.length < 100) hasMore = false;
-                            else {
-                                skip += 100;
-                                await this.sleep(4000);
-                            }
-                        } else {
-                            hasMore = false;
-                        }
-                    } catch (err) {
-                        // Se a organização não tiver o módulo de chats ativado no token, não bloqueia o painel
-                        hasMore = false;
-                    }
-                }
-                return allChats;
             },
 
             getCSAT: async function(dateStr) {
@@ -613,7 +591,10 @@
                                 await this.sleep(6500);
                             }
                         } else hasMore = false;
-                    } catch (err) { hasMore = false; }
+                    } catch (err) { 
+                        console.warn("Aviso: Falha ao buscar CSAT (O módulo pode não estar habilitado no token ou ocorreu um erro de permissão).", err.message);
+                        hasMore = false; 
+                    }
                 }
                 return allResponses;
             }
@@ -625,8 +606,13 @@
                 return [];
             }
             try {
-                // CACHE V21: Módulo completo de Chats e WhatsApp integrado
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v21');
+                // Tenta limpar caches obsoletos para evitar estouro da Quota do navegador (5MB)
+                Object.keys(localStorage).forEach(k => {
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v24') localStorage.removeItem(k);
+                });
+
+                // CACHE V24: Filtro de 90 dias, Separação de Cancelados e Segurança XSS
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v24');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -634,33 +620,41 @@
                     if (diffMins < 5) {
                         MovideskAPI.updateProgress(`Carregando cache super rápida...`);
                         await MovideskAPI.sleep(800); 
-                        return processAndFormatData(cacheObj.tickets, cacheObj.csat, cacheObj.chats);
+                        return processAndFormatData(cacheObj.tickets, cacheObj.csat);
                     }
                 }
             } catch(e) {}
 
             const dataFiltro = new Date();
-            dataFiltro.setDate(dataFiltro.getDate() - 180);
+            // Correção Arquitetural: A API do Movidesk restringe pesquisas genéricas aos últimos 90 dias (Limitação nativa da OData)
+            dataFiltro.setDate(dataFiltro.getDate() - 90);
+            
             const dataIso = dataFiltro.toISOString();
             const dataSomenteDia = dataIso.split('T')[0];
 
             try {
                 const tickets = await MovideskAPI.getTickets(dataIso);
-                MovideskAPI.updateProgress("Iniciando busca de Chats / WhatsApp...");
-                await MovideskAPI.sleep(5000);
-                const chats = await MovideskAPI.getChats(dataSomenteDia);
                 MovideskAPI.updateProgress("Iniciando busca de CSAT...");
-                await MovideskAPI.sleep(5000);
+                await MovideskAPI.sleep(6500);
                 const csat = await MovideskAPI.getCSAT(dataSomenteDia);
                 try {
-                    localStorage.setItem('movidesk_bi_cache_v21', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat, chats: chats }));
-                } catch(e) {}
-                return processAndFormatData(tickets, csat, chats);
+                    localStorage.setItem('movidesk_bi_cache_v24', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                } catch(e) {
+                    console.warn("Aviso: Limite de armazenamento local (localStorage) excedido. O painel funcionará, mas baixará os dados novamente no próximo acesso.", e);
+                }
+                return processAndFormatData(tickets, csat);
             } catch (err) {
                 alert(`Erro de Ligação:\n${err.message}`);
                 return [];
             }
         }
+
+        // ==============================================================================
+        // MÓDULO DE FUSO HORÁRIO E TEMPO (CONVERSORES LOCAIS DE PRECISÃO)
+        // ==============================================================================
+        const padStr = n => String(n).padStart(2, '0');
+        const getLocalIsoDate = (d) => `${d.getFullYear()}-${padStr(d.getMonth() + 1)}-${padStr(d.getDate())}`;
+        const getLocalIsoMonth = (d) => `${d.getFullYear()}-${padStr(d.getMonth() + 1)}`;
 
         function extrairSemana(dataObj) {
             if (!dataObj) return null;
@@ -670,15 +664,34 @@
             startOfWeek.setDate(dataObj.getDate() + diffToMonday);
             const endOfWeek = new Date(startOfWeek);
             endOfWeek.setDate(startOfWeek.getDate() + 6);
-            const pad = n => String(n).padStart(2, '0');
-            const startStr = `${pad(startOfWeek.getDate())}/${pad(startOfWeek.getMonth() + 1)}`;
-            const endStr = `${pad(endOfWeek.getDate())}/${pad(endOfWeek.getMonth() + 1)}`;
-            const sortableDate = `${startOfWeek.getFullYear()}-${pad(startOfWeek.getMonth() + 1)}-${pad(startOfWeek.getDate())}`;
+            
+            const startStr = `${padStr(startOfWeek.getDate())}/${padStr(startOfWeek.getMonth() + 1)}`;
+            const endStr = `${padStr(endOfWeek.getDate())}/${padStr(endOfWeek.getMonth() + 1)}`;
+            const sortableDate = `${startOfWeek.getFullYear()}-${padStr(startOfWeek.getMonth() + 1)}-${padStr(startOfWeek.getDate())}`;
             return `${sortableDate}: ${startStr} a ${endStr}`;
         }
 
+        function paraSegundos(valor) {
+            if (valor === null || valor === undefined || valor === "") return null;
+            if (typeof valor === "number") return valor;
+            if (!isNaN(valor)) return Number(valor);
+
+            const strVal = String(valor).trim();
+            if (strVal.includes(":")) {
+                const partes = strVal.split(":");
+                if (partes.length === 3) {
+                    return (Number(partes[0]) * 3600) + (Number(partes[1]) * 60) + Number(partes[2]);
+                } else if (partes.length === 2) {
+                    return (Number(partes[0]) * 60) + Number(partes[1]);
+                }
+            }
+            let num = parseFloat(strVal);
+            return isNaN(num) ? null : num;
+        }
+
         function formatarTempo(segundos) {
-            if (!segundos || segundos <= 0) return "-";
+            if (segundos === null || segundos === undefined) return "-";
+            if (segundos === 0) return "0seg";
             const hrs = Math.floor(segundos / 3600);
             const mins = Math.floor((segundos % 3600) / 60);
             const segs = Math.round(segundos % 60);
@@ -686,6 +699,8 @@
             if (mins > 0) return `${mins}min ${segs}seg`;
             return `${segs}seg`;
         }
+
+        // ==============================================================================
 
         function renderBadgeSla(status) {
             if(status === 'Violado') return `<span class="bg-red-100 text-red-700 font-bold px-2 py-1 rounded text-[9px] md:text-[10px] uppercase border border-red-200 whitespace-nowrap">Violado</span>`;
@@ -725,10 +740,15 @@
                     </div>`;
         }
 
-        function buildChatCardUI(tit, val) {
+        function buildChatCardUI(tit, val, n = null) {
+            let subTexto = "";
+            if (n !== null) {
+                subTexto = n > 0 ? `<p class="text-[9px] text-slate-400 mt-0.5">n=${n} chats</p>` : `<p class="text-[9px] text-slate-400 mt-0.5">sem dados</p>`;
+            }
             return `<div class="bg-emerald-50/50 border border-emerald-100 p-3 rounded-xl flex flex-col justify-center min-h-[75px] shadow-sm">
                         <p class="text-[9px] font-bold text-emerald-800 uppercase leading-tight mb-1">${tit}</p>
                         <h3 class="text-lg md:text-xl font-black text-emerald-700">${val}</h3>
+                        ${subTexto}
                     </div>`;
         }
 
@@ -755,25 +775,11 @@
                     </div>`;
         }
 
-        function processAndFormatData(ticketsArray, csatArray, chatsArray) {
+        function processAndFormatData(ticketsArray, csatArray) {
             let notasCsatMapeadas = {};
             csatArray.forEach(survey => {
                 if(survey.ticketId) notasCsatMapeadas[survey.ticketId] = parseFloat(survey.value) || parseFloat(survey.response) || parseFloat(survey.rating) || 0;
             });
-
-            // Mapeamento de Chats cruzados por Ticket ID
-            let chatsMapeados = {};
-            if (Array.isArray(chatsArray)) {
-                chatsArray.forEach(chat => {
-                    if (chat.ticketId) {
-                        chatsMapeados[chat.ticketId] = {
-                            esperaSegundos: chat.queueTimeSeconds || chat.waitTimeSeconds || 0,
-                            duracaoSegundos: chat.durationSeconds || chat.chatDurationSeconds || 0,
-                            isOffline: chat.isOffline || chat.offline || false
-                        };
-                    }
-                });
-            }
 
             const originMap = {
                 1: "Web", 2: "Web Analista", 3: "E-mail", 4: "Regra", 5: "Chat On", 6: "Chat Off", 7: "E-mail Auto", 8: "Form Web", 9: "API", 10: "Auto", 13: "Telefone", 18: "WhatsApp", 23: "WhatsApp Biz", 25: "Whats Ativo"
@@ -781,10 +787,16 @@
 
             const hoje = new Date();
 
-            return ticketsArray.map(ticket => {
+            let countIsChat = 0;
+            let countEsperaPreenchida = 0;
+            let countTalkPreenchida = 0;
+            let sampleEspera = [];
+            let sampleTalk = [];
+
+            const formatted = ticketsArray.map(ticket => {
                 const dataCriacao = new Date(ticket.createdDate);
-                const mesCriacao = dataCriacao.toISOString().substring(0, 7);
-                const diaCriacao = dataCriacao.toISOString().split('T')[0];
+                const mesCriacao = getLocalIsoMonth(dataCriacao);
+                const diaCriacao = getLocalIsoDate(dataCriacao);
                 const semanaCriacao = extrairSemana(dataCriacao);
                 
                 const anoCriacao = dataCriacao.getFullYear().toString();
@@ -797,8 +809,8 @@
 
                 if (ticket.resolvedIn) {
                     const dataResolucao = new Date(ticket.resolvedIn);
-                    mesResolucao = dataResolucao.toISOString().substring(0, 7);
-                    diaResolucao = dataResolucao.toISOString().split('T')[0];
+                    mesResolucao = getLocalIsoMonth(dataResolucao);
+                    diaResolucao = getLocalIsoDate(dataResolucao);
                     semanaResolucao = extrairSemana(dataResolucao);
                     
                     anoResolucao = dataResolucao.getFullYear().toString();
@@ -812,7 +824,9 @@
                 }
 
                 let statusBase = ticket.baseStatus;
+                // CORREÇÃO: "Canceled" deixa de ser considerado Resolvido para não inflar métricas (FCR, CSAT, MTTR)
                 let isEncerrado = (statusBase === "Resolved" || statusBase === "Closed" || statusBase === "Canceled");
+                let isResolvido = (statusBase === "Resolved" || statusBase === "Closed");
 
                 let slaStatus = "Sem Contrato";
                 if (ticket.slaSolutionDate) {
@@ -834,9 +848,22 @@
                     }
                 }
 
-                let chatInfo = chatsMapeados[ticket.id] || { esperaSegundos: 0, duracaoSegundos: 0, isOffline: false };
                 let isChatOrWhats = (ticket.origin === 5 || ticket.origin === 6 || ticket.origin === 18 || ticket.origin === 23 || ticket.origin === 25);
+                if (isChatOrWhats) countIsChat++;
 
+                let esperaSeg = paraSegundos(ticket.chatWaitingTime);
+                let talkSeg = paraSegundos(ticket.chatTalkTime);
+
+                if (esperaSeg !== null) {
+                    countEsperaPreenchida++;
+                    if (sampleEspera.length < 3) sampleEspera.push(ticket.chatWaitingTime);
+                }
+                if (talkSeg !== null) {
+                    countTalkPreenchida++;
+                    if (sampleTalk.length < 3) sampleTalk.push(ticket.chatTalkTime);
+                }
+
+                // CORREÇÃO DE SEGURANÇA: Dados externos (nome, motivo) são escapados para impedir falhas visuais ou XSS.
                 return {
                     "ID_Chamado": `#${ticket.id}`,
                     "Mes_Criacao": mesCriacao,
@@ -854,28 +881,38 @@
                     "Data": diaCriacao,
                     "Semana_Exibicao": semanaCriacao,
                     "IsEncerrado": isEncerrado,
-                    "BaseStatus": statusBase,
+                    "IsResolvido": isResolvido,
+                    "BaseStatus": escapeHTML(statusBase),
 
-                    "Nome_Cliente": nomeCliente,
-                    "Urgencia": urgenciaStr,
-                    "Analista": ticket.owner ? ticket.owner.businessName : "Não Atribuído",
-                    "Origem": origemNome,
-                    "Status": ticket.status || "Indefinido",
-                    "Motivo_Espera": ticket.justification || "Nenhum",
-                    "Causa_Raiz": ticket.category || "Não classificado",
+                    "Nome_Cliente": escapeHTML(nomeCliente),
+                    "Urgencia": escapeHTML(urgenciaStr),
+                    "Analista": escapeHTML(ticket.owner ? ticket.owner.businessName : "Não Atribuído"),
+                    "Origem": escapeHTML(origemNome),
+                    "Status": escapeHTML(ticket.status || "Indefinido"),
+                    "Motivo_Espera": escapeHTML(ticket.justification || "Nenhum"),
+                    "Causa_Raiz": escapeHTML(ticket.category || "Não classificado"),
                     "SLA_Status": slaStatus,
                     "FCR": ticket.resolvedInFirstCall ? "Sim" : "Não",
                     "MTTR_Horas": mttrHoras,
                     "Aging_Dias": agingDias,
                     "CSAT": notasCsatMapeadas[ticket.id] || 0,
                     
-                    // CAMPOS EXCLUSIVOS DE CHAT / WHATSAPP
                     "Is_Chat": isChatOrWhats,
-                    "Chat_Espera_Seg": chatInfo.esperaSegundos,
-                    "Chat_Duracao_Seg": chatInfo.duracaoSegundos,
-                    "Chat_Offline": chatInfo.isOffline || ticket.origin === 6
+                    "Chat_Espera_Seg": esperaSeg,
+                    "Chat_Duracao_Seg": talkSeg,
+                    "Chat_Offline": (ticket.origin === 6)
                 };
             });
+
+            console.info("DIAGNOSTICO CHAT API:", {
+                totalIsChat: countIsChat,
+                temChatWaitingTime: countEsperaPreenchida,
+                temChatTalkTime: countTalkPreenchida,
+                sampleEsperaBruta: sampleEspera,
+                sampleTalkBruta: sampleTalk
+            });
+
+            return formatted;
         }
 
         function getFiltroAtivoTexto() {
@@ -1027,6 +1064,7 @@
             };
 
             renderSelect(meses, 'filterMes', true);
+            
             renderSelect(anos, 'compAnoA'); renderSelect(anos, 'compAnoB'); renderSelect(anos, 'compAnoC'); renderSelect(anos, 'compAnoD');
             renderSelect(semestres, 'compSemestreA'); renderSelect(semestres, 'compSemestreB'); renderSelect(semestres, 'compSemestreC'); renderSelect(semestres, 'compSemestreD');
             renderSelect(meses, 'compMesA'); renderSelect(meses, 'compMesB'); renderSelect(meses, 'compMesC'); renderSelect(meses, 'compMesD');
@@ -1039,6 +1077,18 @@
             if(meses.length >= 2) document.getElementById('compMesB').value = meses[1];
             if(semanas.length >= 2) document.getElementById('compSemB').value = semanas[1];
             if(diasAll.length >= 2) document.getElementById('compDiaB').value = diasAll[1]; 
+            
+            if(anos.length >= 3) document.getElementById('compAnoC').value = anos[2];
+            if(semestres.length >= 3) document.getElementById('compSemestreC').value = semestres[2];
+            if(meses.length >= 3) document.getElementById('compMesC').value = meses[2];
+            if(semanas.length >= 3) document.getElementById('compSemC').value = semanas[2];
+            if(diasAll.length >= 3) document.getElementById('compDiaC').value = diasAll[2]; 
+
+            if(anos.length >= 4) document.getElementById('compAnoD').value = anos[3];
+            if(semestres.length >= 4) document.getElementById('compSemestreD').value = semestres[3];
+            if(meses.length >= 4) document.getElementById('compMesD').value = meses[3];
+            if(semanas.length >= 4) document.getElementById('compSemD').value = semanas[3];
+            if(diasAll.length >= 4) document.getElementById('compDiaD').value = diasAll[3]; 
         }
 
         function onMesChange() {
@@ -1056,10 +1106,10 @@
             const valAtual = selDia.value;
             selDia.innerHTML = '<option value="ALL">Todos os Dias</option>';
             
-            const hojeIso = new Date().toISOString().split('T')[0];
+            const hojeIso = getLocalIsoDate(new Date());
             let dataOntem = new Date();
             dataOntem.setDate(dataOntem.getDate() - 1);
-            const ontemIso = dataOntem.toISOString().split('T')[0];
+            const ontemIso = getLocalIsoDate(dataOntem);
 
             dias.forEach(i => {
                 const [ano, m, dia] = i.split('-');
@@ -1078,8 +1128,8 @@
             
             filteredData = rawData.filter(d => {
                 if (mes === "ALL" && dia === "ALL") return true;
-                if (dia !== "ALL") return (d.Data_Criacao === dia || d.Data_Resolucao === dia || !d.IsEncerrado);
-                return (d.Mes_Criacao === mes || d.Mes_Resolucao === mes || !d.IsEncerrado);
+                if (dia !== "ALL") return (d.Data_Criacao === dia || d.Data_Resolucao === dia);
+                return (d.Mes_Criacao === mes || d.Mes_Resolucao === mes);
             });
             
             calculateGlobalKPIs();
@@ -1091,7 +1141,8 @@
 
         function calcMetrics(dataset, targetMes = null, targetDia = null, targetSemana = null, targetSemestre = null, targetAno = null) {
             let baseRecebidos = dataset;
-            let baseResolvidos = dataset.filter(d => d.IsEncerrado);
+            // CORREÇÃO: "Resolvidos" ignora "Cancelados" para não inflar FCR, MTTR e CSAT
+            let baseResolvidos = dataset.filter(d => d.IsResolvido); 
             
             if (targetMes && targetMes !== "ALL") {
                 baseRecebidos = baseRecebidos.filter(d => d.Mes_Criacao === targetMes);
@@ -1116,30 +1167,35 @@
 
             const recebidos = baseRecebidos.length;
             const resolvidos = baseResolvidos.length;
-            const pendentes = dataset.filter(d => !d.IsEncerrado);
+            
+            // CORREÇÃO: Pendentes devem usar o status IsEncerrado para que cancelados saiam do backlog
+            const pendentes = baseRecebidos.filter(d => !d.IsEncerrado);
             const agingMedio = pendentes.length > 0 ? pendentes.reduce((s, d) => s + d.Aging_Dias, 0) / pendentes.length : 0;
+            
             const comSla = baseResolvidos.filter(d => d.SLA_Status !== "Sem Contrato");
             const slaRate = comSla.length > 0 ? (comSla.filter(d => d.SLA_Status === "No Prazo").length / comSla.length) * 100 : 0;
-            const slaViolados = dataset.filter(d => d.SLA_Status === "Violado").length;
+            const slaViolados = baseResolvidos.filter(d => d.SLA_Status === "Violado").length + pendentes.filter(d => d.SLA_Status === "Violado").length;
+            
             const fcrRate = resolvidos > 0 ? (baseResolvidos.filter(d => d.FCR === "Sim").length / resolvidos) * 100 : 0;
             const mttr = resolvidos > 0 ? baseResolvidos.reduce((s, d) => s + d.MTTR_Horas, 0) / resolvidos : 0;
             const csatArr = baseResolvidos.filter(d => d.CSAT > 0);
             const csat = csatArr.length > 0 ? csatArr.reduce((s, d) => s + d.CSAT, 0) / csatArr.length : 0;
             
-            // CÁLCULOS ESPECÍFICOS DE CHAT / WHATSAPP
             const chatsDataset = baseRecebidos.filter(d => d.Is_Chat);
             const chatsAtendidos = chatsDataset.length;
-            const chatsResolvidosPrimeiro = chatsDataset.filter(d => d.FCR === "Sim" && d.IsEncerrado).length;
+            const chatsResolvidosPrimeiro = chatsDataset.filter(d => d.FCR === "Sim" && d.IsResolvido).length;
             const chatsNaoResolvidos = chatsAtendidos - chatsResolvidosPrimeiro;
             const chatsOffline = chatsDataset.filter(d => d.Chat_Offline).length;
 
-            const maxDuracaoSeg = chatsDataset.length > 0 ? Math.max(...chatsDataset.map(d => d.Chat_Duracao_Seg)) : 0;
-            const somaDuracao = chatsDataset.reduce((s, d) => s + d.Chat_Duracao_Seg, 0);
-            const mediaDuracaoSeg = chatsAtendidos > 0 ? somaDuracao / chatsAtendidos : 0;
+            const chatsComDuracao = chatsDataset.filter(d => d.Chat_Duracao_Seg !== null);
+            const nDuracao = chatsComDuracao.length;
+            const maxDuracaoSeg = nDuracao > 0 ? Math.max(...chatsComDuracao.map(d => d.Chat_Duracao_Seg)) : null;
+            const mediaDuracaoSeg = nDuracao > 0 ? (chatsComDuracao.reduce((s, d) => s + d.Chat_Duracao_Seg, 0) / nDuracao) : null;
 
-            const maxEsperaSeg = chatsDataset.length > 0 ? Math.max(...chatsDataset.map(d => d.Chat_Espera_Seg)) : 0;
-            const somaEspera = chatsDataset.reduce((s, d) => s + d.Chat_Espera_Seg, 0);
-            const mediaEsperaSeg = chatsAtendidos > 0 ? somaEspera / chatsAtendidos : 0;
+            const chatsComEspera = chatsDataset.filter(d => d.Chat_Espera_Seg !== null);
+            const nEspera = chatsComEspera.length;
+            const maxEsperaSeg = nEspera > 0 ? Math.max(...chatsComEspera.map(d => d.Chat_Espera_Seg)) : null;
+            const mediaEsperaSeg = nEspera > 0 ? (chatsComEspera.reduce((s, d) => s + d.Chat_Espera_Seg, 0) / nEspera) : null;
 
             return { 
                 recebidos, backlog: pendentes.length, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, csat,
@@ -1149,8 +1205,10 @@
                     naoResolvidos: chatsNaoResolvidos,
                     offline: chatsOffline,
                     maiorDuracao: formatarTempo(maxDuracaoSeg),
+                    nDuracao: nDuracao,
                     mediaDuracao: formatarTempo(mediaDuracaoSeg),
                     maiorEspera: formatarTempo(maxEsperaSeg),
+                    nEspera: nEspera,
                     mediaEspera: formatarTempo(mediaEsperaSeg)
                 }
             };
@@ -1164,7 +1222,7 @@
             document.getElementById('cards-globais').innerHTML = 
                 buildCardUI('Volume', m.recebidos, getCardConfig('Volume')) +
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
-                buildCardUI('Backlog', m.backlog, getCardConfig('Backlog')) +
+                buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
                 buildCardUI('Aging Médio', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
                 buildCardUI('SLA Violado', m.slaViolados, getCardConfig('SLA Violado')) +
                 buildCardUI('SLA Médio', m.slaRate.toFixed(1)+'%', getCardConfig('SLA Média')) +
@@ -1177,10 +1235,10 @@
                 buildChatCardUI('Resolvidos 1º Atend.', m.chat.resolvidosPrimeiro) +
                 buildChatCardUI('Pendentes 1º Atend.', m.chat.naoResolvidos) +
                 buildChatCardUI('Chats Offline', m.chat.offline) +
-                buildChatCardUI('Maior Duração', m.chat.maiorDuracao) +
-                buildChatCardUI('Tempo Médio Duração', m.chat.mediaDuracao) +
-                buildChatCardUI('Maior Espera Fila', m.chat.maiorEspera) +
-                buildChatCardUI('Tempo Médio Espera', m.chat.mediaEspera);
+                buildChatCardUI('Maior Duração', m.chat.maiorDuracao, m.chat.nDuracao) +
+                buildChatCardUI('Tempo Médio Duração', m.chat.mediaDuracao, m.chat.nDuracao) +
+                buildChatCardUI('Maior Espera Fila', m.chat.maiorEspera, m.chat.nEspera) +
+                buildChatCardUI('Tempo Médio Espera', m.chat.mediaEspera, m.chat.nEspera);
         }
 
         function renderDashAnalista() {
@@ -1195,7 +1253,7 @@
 
             document.getElementById('cards-analista').innerHTML = 
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
-                buildCardUI('Backlog', m.backlog, getCardConfig('Backlog')) +
+                buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
                 buildCardUI('Aging', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
                 buildCardUI('SLA Violado', m.slaViolados, getCardConfig('SLA Violado')) +
                 buildCardUI('SLA Médio', m.slaRate.toFixed(1)+'%', getCardConfig('SLA Média')) +
@@ -1208,12 +1266,16 @@
                 buildChatCardUI('Resolvidos 1º Atend.', m.chat.resolvidosPrimeiro) +
                 buildChatCardUI('Pendentes 1º Atend.', m.chat.naoResolvidos) +
                 buildChatCardUI('Chats Offline', m.chat.offline) +
-                buildChatCardUI('Maior Duração', m.chat.maiorDuracao) +
-                buildChatCardUI('Tempo Médio Duração', m.chat.mediaDuracao) +
-                buildChatCardUI('Maior Espera Fila', m.chat.maiorEspera) +
-                buildChatCardUI('Tempo Médio Espera', m.chat.mediaEspera);
+                buildChatCardUI('Maior Duração', m.chat.maiorDuracao, m.chat.nDuracao) +
+                buildChatCardUI('Tempo Médio Duração', m.chat.mediaDuracao, m.chat.nDuracao) +
+                buildChatCardUI('Maior Espera Fila', m.chat.maiorEspera, m.chat.nEspera) +
+                buildChatCardUI('Tempo Médio Espera', m.chat.mediaEspera, m.chat.nEspera);
 
-            const pendentes = dadosA.filter(d => !d.IsEncerrado).sort((a,b) => b.Aging_Dias - a.Aging_Dias);
+            let baseA = dadosA;
+            if(mes !== "ALL") baseA = baseA.filter(d => d.Mes_Criacao === mes);
+            if(dia !== "ALL") baseA = baseA.filter(d => d.Data_Criacao === dia);
+            
+            const pendentes = baseA.filter(d => !d.IsEncerrado).sort((a,b) => b.Aging_Dias - a.Aging_Dias);
             
             document.getElementById('table-fila-analista').innerHTML = pendentes.length === 0 ? `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Fila zerada!</td></tr>` : pendentes.map(d => `
                 <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -1228,7 +1290,7 @@
 
             const sem = [...new Set(dadosA.map(d => d.Semana_Criacao).concat(dadosA.map(d => d.Semana_Resolucao)))].filter(s=>s).sort();
             const recA = sem.map(s => dadosA.filter(d => d.Semana_Criacao === s).length);
-            const resA = sem.map(s => dadosA.filter(d => d.IsEncerrado && d.Semana_Resolucao === s).length);
+            const resA = sem.map(s => dadosA.filter(d => d.IsResolvido && d.Semana_Resolucao === s).length);
 
             if(charts['cpA']) charts['cpA'].destroy();
             charts['cpA'] = new Chart(document.getElementById('chartProdutividadeAnalista'), { 
@@ -1249,10 +1311,17 @@
         }
 
         function renderChartsGlobais() {
+            const mes = document.getElementById('filterMes').value;
+            const dia = document.getElementById('filterDia').value;
+            
+            let baseRecebidos = rawData;
+            if (mes !== "ALL") baseRecebidos = baseRecebidos.filter(d => d.Mes_Criacao === mes);
+            if (dia !== "ALL") baseRecebidos = baseRecebidos.filter(d => d.Data_Criacao === dia);
+
             const mesesStr = [...new Set(rawData.map(d => d.Mes_Criacao).concat(rawData.map(d => d.Mes_Resolucao)))].filter(m=>m).sort();
             const volM = mesesStr.map(m => rawData.filter(d => d.Mes_Criacao === m).length);
             const slaM = mesesStr.map(m => { 
-                let resM = rawData.filter(d => d.IsEncerrado && d.Mes_Resolucao === m && d.SLA_Status !== "Sem Contrato"); 
+                let resM = rawData.filter(d => d.IsResolvido && d.Mes_Resolucao === m && d.SLA_Status !== "Sem Contrato"); 
                 return resM.length ? (resM.filter(x => x.SLA_Status === "No Prazo").length / resM.length) * 100 : 0; 
             });
 
@@ -1261,34 +1330,30 @@
 
             const semGlobais = [...new Set(rawData.map(d => d.Semana_Criacao).concat(rawData.map(d => d.Semana_Resolucao)))].filter(s=>s).sort();
             const recGlobais = semGlobais.map(s => rawData.filter(d => d.Semana_Criacao === s).length);
-            const resGlobais = semGlobais.map(s => rawData.filter(d => d.IsEncerrado && d.Semana_Resolucao === s).length);
+            const resGlobais = semGlobais.map(s => rawData.filter(d => d.IsResolvido && d.Semana_Resolucao === s).length);
 
             if(charts['cpg']) charts['cpg'].destroy();
             charts['cpg'] = new Chart(document.getElementById('chartProdutividadeGlobal'), { type: 'bar', data: { labels: semGlobais.map(s => s.includes(': ') ? s.split(': ')[1] : s), datasets: [{label: 'Entraram', data: recGlobais, backgroundColor: '#cbd5e1'}, {label: 'Resolvidos', data: resGlobais, backgroundColor: '#0d9488'}] }, options: chartOptionsBar });
 
-            const bk = rawData.filter(d => !d.IsEncerrado);
+            const bk = baseRecebidos.filter(d => !d.IsEncerrado);
             const esp = [...new Set(bk.map(d => d.Motivo_Espera))];
             if(charts['cesp']) charts['cesp'].destroy();
             charts['cesp'] = new Chart(document.getElementById('chartEspera'), { type: 'pie', data: { labels: esp, datasets: [{ data: esp.map(e => bk.filter(d => d.Motivo_Espera === e).length), backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#64748b'] }] }, options: donutOptions });
 
-            const mes = document.getElementById('filterMes').value;
-            let baseOrigem = rawData;
-            if(mes !== "ALL") baseOrigem = baseOrigem.filter(d => d.Mes_Criacao === mes);
-
-            const origensG = [...new Set(baseOrigem.map(d => d.Origem))].filter(o => o);
+            const origensG = [...new Set(baseRecebidos.map(d => d.Origem))].filter(o => o);
             if(charts['corigG']) charts['corigG'].destroy();
-            charts['corigG'] = new Chart(document.getElementById('chartOrigemGlobal'), { type: 'doughnut', data: { labels: origensG, datasets: [{ data: origensG.map(o => baseOrigem.filter(d => d.Origem === o).length), backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#64748b'] }] }, options: donutOptions });
+            charts['corigG'] = new Chart(document.getElementById('chartOrigemGlobal'), { type: 'doughnut', data: { labels: origensG, datasets: [{ data: origensG.map(o => baseRecebidos.filter(d => d.Origem === o).length), backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#64748b'] }] }, options: donutOptions });
 
-            let baseCausa = rawData.filter(d => d.IsEncerrado);
+            let baseCausa = rawData.filter(d => d.IsResolvido);
             if(mes !== "ALL") baseCausa = baseCausa.filter(d => d.Mes_Resolucao === mes);
             const cau = [...new Set(baseCausa.map(d => d.Causa_Raiz))].filter(c => c && c !== "Não classificado");
             if(charts['ccr']) charts['ccr'].destroy();
             charts['ccr'] = new Chart(document.getElementById('chartCausaRaiz'), { type: 'bar', data: { labels: cau, datasets: [{ data: cau.map(c => baseCausa.filter(d => d.Causa_Raiz === c).length), backgroundColor: '#10b981' }] }, options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { align: 'end', anchor: 'end' } }, scales: { x: { display: false } } } });
 
-            const pendentesGlobal = rawData.filter(d => !d.IsEncerrado).sort((a, b) => b.Aging_Dias - a.Aging_Dias);
+            const pendentesGlobal = bk.sort((a, b) => b.Aging_Dias - a.Aging_Dias);
             
             document.getElementById('table-fila-global').innerHTML = pendentesGlobal.length === 0 
-                ? `<tr><td colspan="8" class="p-6 text-center text-slate-400 font-bold">Fila global zerada! Excelente trabalho.</td></tr>` 
+                ? `<tr><td colspan="8" class="p-6 text-center text-slate-400 font-bold">Nenhuma pendência retida no período! Excelente trabalho.</td></tr>` 
                 : pendentesGlobal.map(d => `
                 <tr class="border-b border-slate-100 hover:bg-slate-50">
                     <td class="px-4 py-3 font-mono font-bold text-blue-600 text-xs">${d.ID_Chamado}</td>
@@ -1336,8 +1401,8 @@
                     <td class="px-4 py-2 text-center">${renderBadgeSla(d.SLA_Status)}</td>
                     <td class="px-4 py-2 text-[10px] font-bold">${d.Status}</td>
                     <td class="px-4 py-2 text-xs truncate max-w-[150px]" title="${d.Motivo_Espera}">${d.Motivo_Espera}</td>
-                    <td class="px-4 py-2 text-xs">${d.Is_Chat ? formatarTempo(d.Chat_Espera_Seg) : '-'}</td>
-                    <td class="px-4 py-2 text-xs">${d.Is_Chat ? formatarTempo(d.Chat_Duracao_Seg) : '-'}</td>
+                    <td class="px-4 py-2 text-xs text-center font-mono">${d.Is_Chat ? formatarTempo(d.Chat_Espera_Seg) : '-'}</td>
+                    <td class="px-4 py-2 text-xs text-center font-mono">${d.Is_Chat ? formatarTempo(d.Chat_Duracao_Seg) : '-'}</td>
                     <td class="px-4 py-2 text-xs">${d.Causa_Raiz}</td>
                     <td class="px-4 py-2 text-xs text-center">${d.FCR}</td>
                 </tr>`).join('');
