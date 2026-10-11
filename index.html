@@ -135,9 +135,14 @@
                 </div>
             </div>
 
+            <!-- AVISO CSAT -->
+            <div id="csat-warning" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-3 text-sm font-bold text-center print-hide mb-4 shadow-sm">
+                CSAT indisponível: Erro ao buscar dados na API.
+            </div>
+
             <!-- TAB 1: VISÃO GERAL -->
             <div id="visao-geral" class="tab-content active space-y-6 w-full">
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3 md:gap-4 mb-2" id="cards-globais"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3 md:gap-4 mb-2" id="cards-globais"></div>
 
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -310,9 +315,8 @@
                     <select id="selectAnalista" class="bg-slate-900 border border-slate-600 text-white rounded-lg p-2 md:p-3 text-sm font-bold outline-none focus:border-blue-500 w-full md:w-64" onchange="renderDashAnalista()"></select>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 md:gap-4 mb-6" id="cards-analista"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-3 md:gap-4 mb-6" id="cards-analista"></div>
 
-                <!-- SEÇÃO EXCLUSIVA: CHAT & WHATSAPP (INDIVIDUAL) -->
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Operação de Chat & WhatsApp (Individual)
@@ -506,11 +510,12 @@
             sleep: ms => new Promise(r => setTimeout(r, ms)),
             
             get: async function(path, queryParams) {
-                const params = new URLSearchParams(queryParams);
-                params.append('token', this.token);
+                // Encode seguro mantendo formatação OData limpa
+                const queryString = Object.entries(queryParams)
+                    .map(([k,v]) => k + '=' + encodeURI(String(v)))
+                    .join('&') + '&token=' + this.token;
                 
-                const decodedQueryString = decodeURIComponent(params.toString());
-                const url = `${this.baseUrl}${path}?${decodedQueryString}`;
+                const url = `${this.baseUrl}${path}?${queryString}`;
 
                 let retries = 0;
                 while (retries < 3) {
@@ -576,6 +581,7 @@
                 let allResponses = [];
                 let startingAfter = null;
                 let hasMore = true;
+                let failed = false;
 
                 while(hasMore) {
                     this.updateProgress(`A buscar CSAT... ${allResponses.length} processados`);
@@ -592,11 +598,12 @@
                             }
                         } else hasMore = false;
                     } catch (err) { 
-                        console.warn("Aviso: Falha ao buscar CSAT (O módulo pode não estar habilitado no token ou ocorreu um erro de permissão).", err.message);
+                        console.warn("Aviso: Falha ao buscar CSAT.", err.message);
+                        failed = true;
                         hasMore = false; 
                     }
                 }
-                return allResponses;
+                return { items: allResponses, failed: failed };
             }
         };
 
@@ -606,13 +613,11 @@
                 return [];
             }
             try {
-                // Tenta limpar caches obsoletos para evitar estouro da Quota do navegador (5MB)
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v24') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v25') localStorage.removeItem(k);
                 });
 
-                // CACHE V24: Filtro de 90 dias, Separação de Cancelados e Segurança XSS
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v24');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v25');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -626,7 +631,6 @@
             } catch(e) {}
 
             const dataFiltro = new Date();
-            // Correção Arquitetural: A API do Movidesk restringe pesquisas genéricas aos últimos 90 dias (Limitação nativa da OData)
             dataFiltro.setDate(dataFiltro.getDate() - 90);
             
             const dataIso = dataFiltro.toISOString();
@@ -636,11 +640,17 @@
                 const tickets = await MovideskAPI.getTickets(dataIso);
                 MovideskAPI.updateProgress("Iniciando busca de CSAT...");
                 await MovideskAPI.sleep(6500);
-                const csat = await MovideskAPI.getCSAT(dataSomenteDia);
-                try {
-                    localStorage.setItem('movidesk_bi_cache_v24', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
-                } catch(e) {
-                    console.warn("Aviso: Limite de armazenamento local (localStorage) excedido. O painel funcionará, mas baixará os dados novamente no próximo acesso.", e);
+                const csatResult = await MovideskAPI.getCSAT(dataSomenteDia);
+                const csat = csatResult.items;
+
+                if (csatResult.failed) {
+                    document.getElementById('csat-warning').classList.remove('hidden');
+                } else {
+                    try {
+                        localStorage.setItem('movidesk_bi_cache_v25', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                    } catch(e) {
+                        console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
+                    }
                 }
                 return processAndFormatData(tickets, csat);
             } catch (err) {
@@ -674,27 +684,40 @@
         function paraSegundos(valor) {
             if (valor === null || valor === undefined || valor === "") return null;
             if (typeof valor === "number") return valor;
-            if (!isNaN(valor)) return Number(valor);
-
+            
             const strVal = String(valor).trim();
-            if (strVal.includes(":")) {
-                const partes = strVal.split(":");
-                if (partes.length === 3) {
-                    return (Number(partes[0]) * 3600) + (Number(partes[1]) * 60) + Number(partes[2]);
-                } else if (partes.length === 2) {
-                    return (Number(partes[0]) * 60) + Number(partes[1]);
-                }
+            if (strVal === "") return null;
+            if (!isNaN(strVal)) return Number(strVal);
+
+            let dias = 0;
+            let tempoStr = strVal;
+            
+            if (strVal.includes(".")) {
+                const partesDia = strVal.split(".");
+                dias = Number(partesDia[0]);
+                tempoStr = partesDia[1];
             }
-            let num = parseFloat(strVal);
-            return isNaN(num) ? null : num;
+            if (tempoStr.includes(":")) {
+                const partes = tempoStr.split(":");
+                let secs = 0;
+                if (partes.length === 3) {
+                    secs = (Number(partes[0]) * 3600) + (Number(partes[1]) * 60) + Number(partes[2]);
+                } else if (partes.length === 2) {
+                    secs = (Number(partes[0]) * 60) + Number(partes[1]);
+                }
+                return (dias * 86400) + secs;
+            }
+            return null;
         }
 
-        function formatarTempo(segundos) {
-            if (segundos === null || segundos === undefined) return "-";
+        function formatarTempo(segundosOrig) {
+            if (segundosOrig === null || segundosOrig === undefined) return "-";
+            const segundos = Math.round(segundosOrig);
             if (segundos === 0) return "0seg";
+            
             const hrs = Math.floor(segundos / 3600);
             const mins = Math.floor((segundos % 3600) / 60);
-            const segs = Math.round(segundos % 60);
+            const segs = segundos % 60;
             if (hrs > 0) return `${hrs}hr ${mins}min`;
             if (mins > 0) return `${mins}min ${segs}seg`;
             return `${segs}seg`;
@@ -719,6 +742,7 @@
             const map = {
                 'Volume':       {bg: 'bg-slate-50',   txt: 'text-slate-800',   ic: 'fa-inbox'},
                 'Resolvidos':   {bg: 'bg-teal-50',    txt: 'text-teal-600',    ic: 'fa-check-double'},
+                'Cancelados':   {bg: 'bg-slate-100',  txt: 'text-slate-500',   ic: 'fa-ban'},
                 'Backlog':      {bg: 'bg-orange-50',  txt: 'text-orange-600',  ic: 'fa-layer-group'},
                 'Aging':        {bg: 'bg-red-50',     txt: 'text-red-500',     ic: 'fa-calendar-days'},
                 'SLA Violado':  {bg: 'bg-red-100',    txt: 'text-red-700',     ic: 'fa-triangle-exclamation'},
@@ -824,7 +848,6 @@
                 }
 
                 let statusBase = ticket.baseStatus;
-                // CORREÇÃO: "Canceled" deixa de ser considerado Resolvido para não inflar métricas (FCR, CSAT, MTTR)
                 let isEncerrado = (statusBase === "Resolved" || statusBase === "Closed" || statusBase === "Canceled");
                 let isResolvido = (statusBase === "Resolved" || statusBase === "Closed");
 
@@ -863,7 +886,6 @@
                     if (sampleTalk.length < 3) sampleTalk.push(ticket.chatTalkTime);
                 }
 
-                // CORREÇÃO DE SEGURANÇA: Dados externos (nome, motivo) são escapados para impedir falhas visuais ou XSS.
                 return {
                     "ID_Chamado": `#${ticket.id}`,
                     "Mes_Criacao": mesCriacao,
@@ -882,15 +904,15 @@
                     "Semana_Exibicao": semanaCriacao,
                     "IsEncerrado": isEncerrado,
                     "IsResolvido": isResolvido,
-                    "BaseStatus": escapeHTML(statusBase),
+                    "BaseStatus": statusBase,
 
-                    "Nome_Cliente": escapeHTML(nomeCliente),
-                    "Urgencia": escapeHTML(urgenciaStr),
-                    "Analista": escapeHTML(ticket.owner ? ticket.owner.businessName : "Não Atribuído"),
-                    "Origem": escapeHTML(origemNome),
-                    "Status": escapeHTML(ticket.status || "Indefinido"),
-                    "Motivo_Espera": escapeHTML(ticket.justification || "Nenhum"),
-                    "Causa_Raiz": escapeHTML(ticket.category || "Não classificado"),
+                    "Nome_Cliente": nomeCliente,
+                    "Urgencia": urgenciaStr,
+                    "Analista": ticket.owner ? ticket.owner.businessName : "Não Atribuído",
+                    "Origem": origemNome,
+                    "Status": ticket.status || "Indefinido",
+                    "Motivo_Espera": ticket.justification || "Nenhum",
+                    "Causa_Raiz": ticket.category || "Não classificado",
                     "SLA_Status": slaStatus,
                     "FCR": ticket.resolvedInFirstCall ? "Sim" : "Não",
                     "MTTR_Horas": mttrHoras,
@@ -1043,13 +1065,30 @@
             const analistas = [...new Set(rawData.map(d => d.Analista))].sort();
             const diasAll = [...new Set(rawData.map(d => d.Data_Criacao).concat(rawData.map(d => d.Data_Resolucao)))].filter(d=>d).sort().reverse();
             
+            const df = new Date();
+            df.setDate(df.getDate() - 90);
+            const cutoffDateIso = getLocalIsoDate(df);
+
+            const renderSelectMeses = (arr, elId, includeAll = false) => {
+                const sel = document.getElementById(elId);
+                if(!sel) return;
+                sel.innerHTML = includeAll ? '<option value="ALL">Todos os Períodos</option>' : '';
+                arr.forEach(i => {
+                    let label = i;
+                    if (i + "-01" < cutoffDateIso) {
+                        label += " (parcial)";
+                    }
+                    sel.innerHTML += `<option value="${escapeHTML(i)}">${escapeHTML(label)}</option>`;
+                });
+            };
+
             const renderSelect = (arr, elId, includeAll = false, isWeek = false) => {
                 const sel = document.getElementById(elId);
                 if(!sel) return;
                 sel.innerHTML = includeAll ? '<option value="ALL">Todos os Períodos</option>' : '';
                 arr.forEach(i => {
                     let label = isWeek && i.includes(': ') ? i.split(': ')[1] : i;
-                    sel.innerHTML += `<option value="${i}">${label}</option>`;
+                    sel.innerHTML += `<option value="${escapeHTML(i)}">${escapeHTML(label)}</option>`;
                 });
             };
 
@@ -1059,15 +1098,15 @@
                 sel.innerHTML = '';
                 arr.forEach(i => {
                     const [ano, m, dia] = i.split('-');
-                    sel.innerHTML += `<option value="${i}">${dia}/${m}/${ano}</option>`;
+                    sel.innerHTML += `<option value="${escapeHTML(i)}">${dia}/${m}/${ano}</option>`;
                 });
             };
 
-            renderSelect(meses, 'filterMes', true);
+            renderSelectMeses(meses, 'filterMes', true);
             
             renderSelect(anos, 'compAnoA'); renderSelect(anos, 'compAnoB'); renderSelect(anos, 'compAnoC'); renderSelect(anos, 'compAnoD');
             renderSelect(semestres, 'compSemestreA'); renderSelect(semestres, 'compSemestreB'); renderSelect(semestres, 'compSemestreC'); renderSelect(semestres, 'compSemestreD');
-            renderSelect(meses, 'compMesA'); renderSelect(meses, 'compMesB'); renderSelect(meses, 'compMesC'); renderSelect(meses, 'compMesD');
+            renderSelectMeses(meses, 'compMesA'); renderSelectMeses(meses, 'compMesB'); renderSelectMeses(meses, 'compMesC'); renderSelectMeses(meses, 'compMesD');
             renderSelect(semanas, 'compSemA', false, true); renderSelect(semanas, 'compSemB', false, true); renderSelect(semanas, 'compSemC', false, true); renderSelect(semanas, 'compSemD', false, true);
             renderSelect(analistas, 'selectAnalista');
             renderDiaOptions(diasAll, 'compDiaA'); renderDiaOptions(diasAll, 'compDiaB'); renderDiaOptions(diasAll, 'compDiaC'); renderDiaOptions(diasAll, 'compDiaD');
@@ -1116,7 +1155,7 @@
                 let label = `${dia}/${m}/${ano}`;
                 if (i === hojeIso) label = `Hoje (${label})`;
                 if (i === ontemIso) label = `Ontem (${label})`;
-                selDia.innerHTML += `<option value="${i}">${label}</option>`;
+                selDia.innerHTML += `<option value="${escapeHTML(i)}">${escapeHTML(label)}</option>`;
             });
             if(valAtual !== "ALL" && dias.includes(valAtual)) selDia.value = valAtual;
         }
@@ -1141,7 +1180,6 @@
 
         function calcMetrics(dataset, targetMes = null, targetDia = null, targetSemana = null, targetSemestre = null, targetAno = null) {
             let baseRecebidos = dataset;
-            // CORREÇÃO: "Resolvidos" ignora "Cancelados" para não inflar FCR, MTTR e CSAT
             let baseResolvidos = dataset.filter(d => d.IsResolvido); 
             
             if (targetMes && targetMes !== "ALL") {
@@ -1167,8 +1205,8 @@
 
             const recebidos = baseRecebidos.length;
             const resolvidos = baseResolvidos.length;
+            const cancelados = baseRecebidos.filter(d => d.BaseStatus === "Canceled").length;
             
-            // CORREÇÃO: Pendentes devem usar o status IsEncerrado para que cancelados saiam do backlog
             const pendentes = baseRecebidos.filter(d => !d.IsEncerrado);
             const agingMedio = pendentes.length > 0 ? pendentes.reduce((s, d) => s + d.Aging_Dias, 0) / pendentes.length : 0;
             
@@ -1198,7 +1236,7 @@
             const mediaEsperaSeg = nEspera > 0 ? (chatsComEspera.reduce((s, d) => s + d.Chat_Espera_Seg, 0) / nEspera) : null;
 
             return { 
-                recebidos, backlog: pendentes.length, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, csat,
+                recebidos, cancelados, backlog: pendentes.length, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, csat,
                 chat: {
                     atendidos: chatsAtendidos,
                     resolvidosPrimeiro: chatsResolvidosPrimeiro,
@@ -1222,6 +1260,7 @@
             document.getElementById('cards-globais').innerHTML = 
                 buildCardUI('Volume', m.recebidos, getCardConfig('Volume')) +
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
+                buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
                 buildCardUI('Aging Médio', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
                 buildCardUI('SLA Violado', m.slaViolados, getCardConfig('SLA Violado')) +
@@ -1233,7 +1272,7 @@
             document.getElementById('cards-chat-globais').innerHTML = 
                 buildChatCardUI('Chats Atendidos', m.chat.atendidos) +
                 buildChatCardUI('Resolvidos 1º Atend.', m.chat.resolvidosPrimeiro) +
-                buildChatCardUI('Pendentes 1º Atend.', m.chat.naoResolvidos) +
+                buildChatCardUI('Não resolv. no 1º atend.', m.chat.naoResolvidos) +
                 buildChatCardUI('Chats Offline', m.chat.offline) +
                 buildChatCardUI('Maior Duração', m.chat.maiorDuracao, m.chat.nDuracao) +
                 buildChatCardUI('Tempo Médio Duração', m.chat.mediaDuracao, m.chat.nDuracao) +
@@ -1253,6 +1292,7 @@
 
             document.getElementById('cards-analista').innerHTML = 
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
+                buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
                 buildCardUI('Aging', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
                 buildCardUI('SLA Violado', m.slaViolados, getCardConfig('SLA Violado')) +
@@ -1264,7 +1304,7 @@
             document.getElementById('cards-chat-analista').innerHTML = 
                 buildChatCardUI('Chats Atendidos', m.chat.atendidos) +
                 buildChatCardUI('Resolvidos 1º Atend.', m.chat.resolvidosPrimeiro) +
-                buildChatCardUI('Pendentes 1º Atend.', m.chat.naoResolvidos) +
+                buildChatCardUI('Não resolv. no 1º atend.', m.chat.naoResolvidos) +
                 buildChatCardUI('Chats Offline', m.chat.offline) +
                 buildChatCardUI('Maior Duração', m.chat.maiorDuracao, m.chat.nDuracao) +
                 buildChatCardUI('Tempo Médio Duração', m.chat.mediaDuracao, m.chat.nDuracao) +
@@ -1280,12 +1320,12 @@
             document.getElementById('table-fila-analista').innerHTML = pendentes.length === 0 ? `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Fila zerada!</td></tr>` : pendentes.map(d => `
                 <tr class="border-b border-slate-100 hover:bg-slate-50">
                     <td class="px-4 py-3 font-mono font-bold text-blue-600 text-xs">${d.ID_Chamado}</td>
-                    <td class="px-4 py-3 text-xs font-bold text-slate-700 truncate max-w-[200px]" title="${d.Nome_Cliente}">${d.Nome_Cliente}</td>
+                    <td class="px-4 py-3 text-xs font-bold text-slate-700 truncate max-w-[200px]" title="${escapeHTML(d.Nome_Cliente)}">${escapeHTML(d.Nome_Cliente)}</td>
                     <td class="px-4 py-3 text-center">${renderBadgeUrgencia(d.Urgencia)}</td>
                     <td class="px-4 py-3 font-bold text-red-500 text-xs text-center">${d.Aging_Dias.toFixed(1)}d</td>
                     <td class="px-4 py-3 text-center">${renderBadgeSla(d.SLA_Status)}</td>
-                    <td class="px-4 py-3 text-[10px] font-bold">${d.Status}</td>
-                    <td class="px-4 py-3 text-[10px] text-slate-500 truncate max-w-[150px]" title="${d.Motivo_Espera}">${d.Motivo_Espera}</td>
+                    <td class="px-4 py-3 text-[10px] font-bold">${escapeHTML(d.Status)}</td>
+                    <td class="px-4 py-3 text-[10px] text-slate-500 truncate max-w-[150px]" title="${escapeHTML(d.Motivo_Espera)}">${escapeHTML(d.Motivo_Espera)}</td>
                 </tr>`).join('');
 
             const sem = [...new Set(dadosA.map(d => d.Semana_Criacao).concat(dadosA.map(d => d.Semana_Resolucao)))].filter(s=>s).sort();
@@ -1357,13 +1397,13 @@
                 : pendentesGlobal.map(d => `
                 <tr class="border-b border-slate-100 hover:bg-slate-50">
                     <td class="px-4 py-3 font-mono font-bold text-blue-600 text-xs">${d.ID_Chamado}</td>
-                    <td class="px-4 py-3 text-xs font-bold text-slate-700 truncate max-w-[200px]" title="${d.Nome_Cliente}">${d.Nome_Cliente}</td>
+                    <td class="px-4 py-3 text-xs font-bold text-slate-700 truncate max-w-[200px]" title="${escapeHTML(d.Nome_Cliente)}">${escapeHTML(d.Nome_Cliente)}</td>
                     <td class="px-4 py-3 text-center">${renderBadgeUrgencia(d.Urgencia)}</td>
-                    <td class="px-4 py-3 text-xs font-bold text-slate-700">${d.Analista}</td>
+                    <td class="px-4 py-3 text-xs font-bold text-slate-700">${escapeHTML(d.Analista)}</td>
                     <td class="px-4 py-3 font-bold text-red-500 text-xs text-center">${d.Aging_Dias.toFixed(1)}d</td>
                     <td class="px-4 py-3 text-center">${renderBadgeSla(d.SLA_Status)}</td>
-                    <td class="px-4 py-3 text-[10px] font-bold">${d.Status}</td>
-                    <td class="px-4 py-3 text-[10px] text-slate-500 truncate max-w-[150px]" title="${d.Motivo_Espera}">${d.Motivo_Espera}</td>
+                    <td class="px-4 py-3 text-[10px] font-bold">${escapeHTML(d.Status)}</td>
+                    <td class="px-4 py-3 text-[10px] text-slate-500 truncate max-w-[150px]" title="${escapeHTML(d.Motivo_Espera)}">${escapeHTML(d.Motivo_Espera)}</td>
                 </tr>`).join('');
         }
 
@@ -1374,7 +1414,7 @@
 
             document.getElementById('table-comparativo-equipe').innerHTML = analistas.map(ana => {
                 let m = calcMetrics(rawData.filter(d => d.Analista === ana), mes, dia);
-                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${ana}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td></tr>`;
+                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td></tr>`;
             }).join('');
 
             const baseOrdenada = [...filteredData].sort((a, b) => {
@@ -1388,22 +1428,22 @@
             document.getElementById('table-base-body').innerHTML = baseOrdenada.map(d => `
                 <tr class="border-b border-slate-100 hover:bg-slate-50">
                     <td class="px-4 py-2 text-xs font-mono text-blue-600">${d.ID_Chamado}</td>
-                    <td class="px-4 py-2 text-xs font-bold text-slate-700 truncate max-w-[200px]" title="${d.Nome_Cliente}">${d.Nome_Cliente}</td>
+                    <td class="px-4 py-2 text-xs font-bold text-slate-700 truncate max-w-[200px]" title="${escapeHTML(d.Nome_Cliente)}">${escapeHTML(d.Nome_Cliente)}</td>
                     <td class="px-4 py-2 text-xs">${d.Data_Criacao}</td>
                     <td class="px-4 py-2 text-xs text-slate-400">${d.Semana_Exibicao.includes(': ')?d.Semana_Exibicao.split(': ')[1]:d.Semana_Exibicao}</td>
                     <td class="px-4 py-2 text-xs font-bold text-slate-500">${d.Mes_Criacao}</td>
                     <td class="px-4 py-2 text-xs font-bold text-slate-500">${d.Semestre_Criacao}</td>
                     <td class="px-4 py-2 text-xs font-bold text-slate-500">${d.Ano_Criacao}</td>
-                    <td class="px-4 py-2 text-xs font-bold text-emerald-600">${d.Origem}</td>
+                    <td class="px-4 py-2 text-xs font-bold text-emerald-600">${escapeHTML(d.Origem)}</td>
                     <td class="px-4 py-2 text-xs">${renderBadgeUrgencia(d.Urgencia)}</td>
-                    <td class="px-4 py-2 text-xs font-bold">${d.Analista}</td>
+                    <td class="px-4 py-2 text-xs font-bold">${escapeHTML(d.Analista)}</td>
                     <td class="px-4 py-2 text-xs text-center font-bold">${d.Aging_Dias.toFixed(1)}</td>
                     <td class="px-4 py-2 text-center">${renderBadgeSla(d.SLA_Status)}</td>
-                    <td class="px-4 py-2 text-[10px] font-bold">${d.Status}</td>
-                    <td class="px-4 py-2 text-xs truncate max-w-[150px]" title="${d.Motivo_Espera}">${d.Motivo_Espera}</td>
-                    <td class="px-4 py-2 text-xs text-center font-mono">${d.Is_Chat ? formatarTempo(d.Chat_Espera_Seg) : '-'}</td>
-                    <td class="px-4 py-2 text-xs text-center font-mono">${d.Is_Chat ? formatarTempo(d.Chat_Duracao_Seg) : '-'}</td>
-                    <td class="px-4 py-2 text-xs">${d.Causa_Raiz}</td>
+                    <td class="px-4 py-2 text-[10px] font-bold">${escapeHTML(d.Status)}</td>
+                    <td class="px-4 py-2 text-xs truncate max-w-[150px]" title="${escapeHTML(d.Motivo_Espera)}">${escapeHTML(d.Motivo_Espera)}</td>
+                    <td class="px-4 py-2 text-xs text-center font-mono">${formatarTempo(d.Chat_Espera_Seg)}</td>
+                    <td class="px-4 py-2 text-xs text-center font-mono">${formatarTempo(d.Chat_Duracao_Seg)}</td>
+                    <td class="px-4 py-2 text-xs">${escapeHTML(d.Causa_Raiz)}</td>
                     <td class="px-4 py-2 text-xs text-center">${d.FCR}</td>
                 </tr>`).join('');
         }
