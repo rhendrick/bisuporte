@@ -234,7 +234,7 @@
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-blue-600 text-base"></i> Indicadores Principais (Individual)
                     </h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4" id="cards-analista"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4" id="cards-analista"></div>
                 </div>
 
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
@@ -585,6 +585,14 @@
         const META_ADERENCIA_CSAT = null; 
         const STATUS_ESCALONAMENTO = ['desenvolvimento', 'comercial'];
 
+        // DICIONÁRIO DE PERGUNTAS CSAT
+        // Substitua os textos abaixo pelas frases exatas que você configurou no Movidesk
+        const DICIONARIO_PERGUNTAS = {
+            "Z94k": "Avaliação do Atendimento",
+            "94xd": "Avaliação do Tempo de Solução",
+            "GQAe": "Avaliação do Conhecimento Técnico"
+        };
+
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
             return String(str).replace(/[&<>'"]/g, function(tag) {
@@ -740,10 +748,10 @@
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v40') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v41') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v40');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v41');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -766,7 +774,7 @@
                                             questionId: ans.questionId,
                                             questionType: ans.questionType,
                                             response: ans.response,
-                                            comments: ans.comments
+                                            comments: ans.comments || ans.comment || ans.justification || ans.feedback || ans.observation || ans.text
                                         });
                                     });
                                 }
@@ -806,7 +814,7 @@
                                     questionId: ans.questionId,
                                     questionType: ans.questionType,
                                     response: ans.response,
-                                    comments: ans.comments
+                                    comments: ans.comments || ans.comment || ans.justification || ans.feedback || ans.observation || ans.text
                                 });
                             });
                         }
@@ -818,7 +826,7 @@
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v40', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v41', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
@@ -901,6 +909,7 @@
                 'SLA Média':    {bg: 'bg-blue-50',    txt: 'text-blue-600',    ic: 'fa-stopwatch', bd: 'border-blue-100'},
                 'FCR':          {bg: 'bg-emerald-50', txt: 'text-emerald-600', ic: 'fa-bolt', bd: 'border-emerald-100'},
                 'MTTR':         {bg: 'bg-purple-50',  txt: 'text-purple-600',  ic: 'fa-clock-rotate-left', bd: 'border-purple-100'},
+                'Taxa Escalonamento': {bg: 'bg-fuchsia-50', txt: 'text-fuchsia-600', ic: 'fa-share-nodes', bd: 'border-fuchsia-100'},
                 'CSAT':         {bg: 'bg-yellow-50',  txt: 'text-yellow-600',  ic: 'fa-star', bd: 'border-yellow-100'},
                 'Aderência CSAT': {bg: 'bg-amber-50', txt: 'text-amber-600',   ic: 'fa-clipboard-check', bd: 'border-amber-100'}
             };
@@ -961,36 +970,32 @@
         }
 
         function processAndFormatData(ticketsArray, csatArray) {
+            const notaCsatValida = survey => {
+                const tipo = Number(survey.type);
+                const valorBruto = survey.value ?? survey.response ?? survey.rating;
+                const valor = Number(valorBruto);
+                if (!Number.isFinite(valor)) return null;
+                if (tipo === 1) return valor === 1 ? 5 : (valor === 2 ? 1 : null);
+                if (tipo === 2 && valor >= 1 && valor <= 5) return valor;
+                return null;
+            };
+
             const respostasPorTicket = new Map();
-            
-            if (Array.isArray(csatArray)) {
-                csatArray.forEach(surveyEnvelope => {
-                    const ticketId = String(surveyEnvelope.ticketId);
-                    const dataResposta = Date.parse(surveyEnvelope.responseDate || '') || 0;
-                    
-                    if (surveyEnvelope.items && Array.isArray(surveyEnvelope.items)) {
-                        surveyEnvelope.items.forEach(ans => {
-                            let nota = null;
-                            const tipo = Number(ans.questionType);
-                            const val = Number(ans.response);
-                            if (tipo === 1) {
-                                nota = (val === 1) ? 5 : ((val === 2) ? 1 : null);
-                            } else if (tipo === 2 && val >= 1 && val <= 5) {
-                                nota = val;
-                            }
-                            if (nota !== null) {
-                                const perguntaId = String(ans.questionId || 'Geral');
-                                if (!respostasPorTicket.has(ticketId)) respostasPorTicket.set(ticketId, new Map());
-                                const respostasPorPergunta = respostasPorTicket.get(ticketId);
-                                const anterior = respostasPorPergunta.get(perguntaId);
-                                if (!anterior || dataResposta >= anterior.dataResposta) {
-                                    respostasPorPergunta.set(perguntaId, { nota, dataResposta });
-                                }
-                            }
-                        });
-                    }
-                });
-            }
+            (Array.isArray(csatArray) ? csatArray : []).forEach(survey => {
+                if (!survey || survey.ticketId === null || survey.ticketId === undefined) return;
+                const nota = notaCsatValida(survey);
+                if (nota === null) return;
+
+                const ticketId = String(survey.ticketId);
+                const perguntaId = String(survey.questionId ?? `tipo-${survey.type}`);
+                const dataResposta = Date.parse(survey.responseDate || '') || 0;
+                if (!respostasPorTicket.has(ticketId)) respostasPorTicket.set(ticketId, new Map());
+                const respostasPorPergunta = respostasPorTicket.get(ticketId);
+                const anterior = respostasPorPergunta.get(perguntaId);
+                if (!anterior || dataResposta >= anterior.dataResposta) {
+                    respostasPorPergunta.set(perguntaId, { nota, dataResposta });
+                }
+            });
 
             const notasCsatMapeadas = Object.create(null);
             respostasPorTicket.forEach((respostas, ticketId) => {
@@ -1755,15 +1760,21 @@
                 const cliente = ticketClientMap.get(tId) || "Cliente";
                 const dataResp = item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-';
                 
-                const pergunta = item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`;
+                let pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
                 
                 const tipo = Number(item.questionType);
                 const val = Number(item.response || item.value || item.rating);
                 let notaTexto = item.response || item.value || item.rating || '-';
+                let comentario = item.comments || '-';
                 
-                if (tipo === 1) { 
-                    if (val === 1) notaTexto = "Satisfeito";
-                    else if (val === 2) notaTexto = "Insatisfeito";
+                if (tipo === 3 || tipo === 4 || isNaN(val)) {
+                    if (comentario === '-' && notaTexto !== '-') {
+                        comentario = notaTexto;
+                        notaTexto = '-';
+                    }
+                } else if (tipo === 1) { 
+                    if (val === 1) notaTexto = "5 - Satisfeito";
+                    else if (val === 2) notaTexto = "1 - Insatisfeito";
                 } else if (tipo === 2) { 
                     if (val === 5) notaTexto = "5 - Muito Satisfeito";
                     else if (val === 4) notaTexto = "4 - Satisfeito";
@@ -1771,8 +1782,6 @@
                     else if (val === 2) notaTexto = "2 - Insatisfeito";
                     else if (val === 1) notaTexto = "1 - Muito Insatisfeito";
                 }
-
-                const comentario = item.comment || item.comments || item.feedback || item.observation || item.answer || '-';
 
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -1962,15 +1971,21 @@
                     const ticketOwnerMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Analista]));
                     const ticketClientMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Nome_Cliente]));
                     
-                    const pergunta = item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`;
+                    let pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`;
                     
                     const tipo = Number(item.questionType);
                     const val = Number(item.response || item.value || item.rating);
                     let notaTexto = item.response || item.value || item.rating || '-';
+                    let comentario = item.comments || '-';
                     
-                    if (tipo === 1) { 
-                        if (val === 1) notaTexto = "Satisfeito";
-                        else if (val === 2) notaTexto = "Insatisfeito";
+                    if (tipo === 3 || tipo === 4 || isNaN(val)) {
+                        if (comentario === '-' && notaTexto !== '-') {
+                            comentario = notaTexto;
+                            notaTexto = '-';
+                        }
+                    } else if (tipo === 1) { 
+                        if (val === 1) notaTexto = "5 - Satisfeito";
+                        else if (val === 2) notaTexto = "1 - Insatisfeito";
                     } else if (tipo === 2) { 
                         if (val === 5) notaTexto = "5 - Muito Satisfeito";
                         else if (val === 4) notaTexto = "4 - Satisfeito";
@@ -1978,8 +1993,6 @@
                         else if (val === 2) notaTexto = "2 - Insatisfeito";
                         else if (val === 1) notaTexto = "1 - Muito Insatisfeito";
                     }
-
-                    const comentario = item.comment || item.comments || item.feedback || item.observation || item.answer || '-';
 
                     return {
                         "ID do Chamado": `#${tId}`,
