@@ -101,7 +101,7 @@
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-comparativo', this)"><i class="fa-solid fa-scale-balanced w-4"></i> Comparativos</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-legendas', this)"><i class="fa-solid fa-book-open w-4"></i> Dicionário de Métricas</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('base-dados', this)"><i class="fa-solid fa-database w-4"></i> Base de Chamados</button>
-            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('auditoria-csat', this)"><i class="fa-solid fa-star text-yellow-400 w-4"></i> Auditoria CSAT</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('auditoria-csat', this)"><i class="fa-solid fa-star w-4"></i> Auditoria CSAT</button>
         </div>
     </aside>
 
@@ -724,10 +724,10 @@
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v38') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v40') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v38');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v40');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -759,7 +759,7 @@
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v38', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v40', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
@@ -1691,9 +1691,11 @@
                 const analista = ticketOwnerMap.get(tId) || "Não Atribuído";
                 const cliente = ticketClientMap.get(tId) || "Cliente";
                 const dataResp = item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-';
-                const pergunta = item.questionDescription || item.question || "Pergunta de Satisfação";
+                
+                // Mapeamento exato de todas as possíveis variações de propriedades de pergunta e comentário no Movidesk
+                const pergunta = item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`;
                 const notaVal = item.value ?? item.response ?? item.rating ?? '-';
-                const comentario = item.comment || item.comments || '-';
+                const comentario = item.comment || item.comments || item.feedback || item.observation || item.answer || '-';
 
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -1887,9 +1889,9 @@
                         "Nome do Analista": ticketOwnerMap.get(tId) || "Não Atribuído",
                         "Data da Resposta": item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-',
                         "Nome do Cliente": ticketClientMap.get(tId) || "Cliente",
-                        "A Pergunta Feita": item.questionDescription || item.question || "Pergunta de Satisfação",
+                        "A Pergunta Feita": item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`,
                         "A Nota Dada (1-5)": item.value ?? item.response ?? item.rating ?? '-',
-                        "Comentário Escrito": item.comment || item.comments || '-'
+                        "Comentário Escrito": item.comment || item.comments || item.feedback || item.observation || item.answer || '-'
                     };
                 });
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dadosCsatExport), "Auditoria_CSAT");
