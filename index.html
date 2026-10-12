@@ -81,7 +81,11 @@
                 <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-3">Filtro Global</p>
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Mês / Ano</label>
+                        <label class="block text-xs text-slate-400 mb-1">Ano</label>
+                        <select id="filterAno" class="w-full bg-slate-800 border border-slate-700 text-sm text-slate-200 rounded p-2 outline-none focus:border-blue-500" onchange="onAnoChange()"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Mês</label>
                         <select id="filterMes" class="w-full bg-slate-800 border border-slate-700 text-sm text-slate-200 rounded p-2 outline-none focus:border-blue-500" onchange="onMesChange()"></select>
                     </div>
                     <div>
@@ -93,10 +97,10 @@
 
             <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Painéis Operacionais</p>
             <button class="tab-btn active text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-geral', this)"><i class="fa-solid fa-chart-pie w-4"></i> Executivo Global</button>
-            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-comparativo', this)"><i class="fa-solid fa-scale-balanced w-4"></i> Comparativos</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-analista-diario', this)"><i class="fa-solid fa-user-check w-4"></i> Meu Painel (Diário)</button>
-            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('base-dados', this)"><i class="fa-solid fa-database w-4"></i> Base de Chamados</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-comparativo', this)"><i class="fa-solid fa-scale-balanced w-4"></i> Comparativos</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-legendas', this)"><i class="fa-solid fa-book-open w-4"></i> Dicionário de Métricas</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('base-dados', this)"><i class="fa-solid fa-database w-4"></i> Base de Chamados</button>
         </div>
     </aside>
 
@@ -208,106 +212,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: COMPARATIVOS -->
-            <div id="visao-comparativo" class="tab-content space-y-6 w-full">
-                
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar text-red-500 mr-2"></i> Comparativo Anual (YoY)</h3>
-                        <div class="flex flex-wrap gap-2 items-center print-hide">
-                            <select id="compAnoA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            <span class="text-slate-400 font-bold text-xs">VS</span>
-                            <select id="compAnoB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            
-                            <select id="compAnoC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            <select id="compAnoD" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            
-                            <button onclick="addPeriodo('Ano')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
-                            <button id="btnRemoveAno" onclick="removePeriodo('Ano')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
-                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompAnual"></canvas></div>
-                </div>
-
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-minus text-orange-500 mr-2"></i> Comparativo Semestral</h3>
-                        <div class="flex flex-wrap gap-2 items-center print-hide">
-                            <select id="compSemestreA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[120px]" onchange="calcularComparativos()"></select>
-                            <span class="text-slate-400 font-bold text-xs">VS</span>
-                            <select id="compSemestreB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[120px]" onchange="calcularComparativos()"></select>
-                            
-                            <select id="compSemestreC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[120px]" onchange="calcularComparativos()"></select>
-                            <select id="compSemestreD" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[120px]" onchange="calcularComparativos()"></select>
-                            
-                            <button onclick="addPeriodo('Semestre')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
-                            <button id="btnRemoveSemestre" onclick="removePeriodo('Semestre')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
-                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemestral"></canvas></div>
-                </div>
-
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-days text-blue-500 mr-2"></i> Comparativo Mensal (MoM)</h3>
-                        <div class="flex flex-wrap gap-2 items-center print-hide">
-                            <select id="compMesA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            <span class="text-slate-400 font-bold text-xs">VS</span>
-                            <select id="compMesB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            
-                            <select id="compMesC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            <select id="compMesD" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            
-                            <button onclick="addPeriodo('Mes')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
-                            <button id="btnRemoveMes" onclick="removePeriodo('Mes')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
-                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompMensal"></canvas></div>
-                </div>
-
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-week text-purple-500 mr-2"></i> Comparativo Semanal (WoW)</h3>
-                        <div class="flex flex-wrap gap-2 items-center print-hide">
-                            <select id="compSemA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[150px]" onchange="calcularComparativos()"></select>
-                            <span class="text-slate-400 font-bold text-xs">VS</span>
-                            <select id="compSemB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[150px]" onchange="calcularComparativos()"></select>
-                            
-                            <select id="compSemC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[150px]" onchange="calcularComparativos()"></select>
-                            <select id="compSemD" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[150px]" onchange="calcularComparativos()"></select>
-                            
-                            <button onclick="addPeriodo('Sem')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
-                            <button id="btnRemoveSem" onclick="removePeriodo('Sem')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
-                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemanal"></canvas></div>
-                </div>
-
-                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-day text-emerald-500 mr-2"></i> Comparativo Diário (DoD)</h3>
-                        <div class="flex flex-wrap gap-2 items-center print-hide">
-                            <select id="compDiaA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            <span class="text-slate-400 font-bold text-xs">VS</span>
-                            <select id="compDiaB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            
-                            <select id="compDiaC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            <select id="compDiaD" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
-                            
-                            <button onclick="addPeriodo('Dia')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
-                            <button id="btnRemoveDia" onclick="removePeriodo('Dia')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
-                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompDiario"></canvas></div>
-                </div>
-            </div>
-
-            <!-- TAB 3: DASHBOARD DIÁRIO DO ANALISTA -->
+            <!-- TAB 2: DASHBOARD DIÁRIO DO ANALISTA -->
             <div id="visao-analista-diario" class="tab-content w-full">
                 <div class="bg-slate-800 rounded-xl shadow-md border border-slate-700 p-4 md:p-6 mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4 text-white print-hide">
                     <div class="flex items-center gap-4">
@@ -386,44 +291,107 @@
                 </div>
             </div>
 
-            <!-- TAB 4: BASE DE DADOS -->
-            <div id="base-dados" class="tab-content w-full">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px] md:h-[600px] w-full print-break-inside">
-                    <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50">
-                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-list-ul text-blue-500 mr-2"></i> Base Analítica (Sincronizada)</h3>
-                        <span id="contador-base" class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider self-start md:self-auto">0 resultados</span>
+            <!-- TAB 3: COMPARATIVOS -->
+            <div id="visao-comparativo" class="tab-content space-y-6 w-full">
+                
+                <!-- COMPARATIVO DIÁRIO -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-day text-emerald-500 mr-2"></i> Comparativo Diário (DoD)</h3>
+                        <div class="flex flex-wrap gap-2 items-center print-hide">
+                            <select id="compDiaA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            <span class="text-slate-400 font-bold text-xs">VS</span>
+                            <select id="compDiaB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            
+                            <select id="compDiaC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            
+                            <button id="btnAddDia" onclick="addPeriodo('Dia')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
+                            <button id="btnRemoveDia" onclick="removePeriodo('Dia')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
+                        </div>
                     </div>
-                    <div class="flex-1 overflow-auto scrollbar-thin">
-                        <table class="w-full text-sm text-left whitespace-nowrap">
-                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b sticky top-0 z-10">
-                                <tr>
-                                    <th class="px-4 py-3">ID</th>
-                                    <th class="px-4 py-3">Razão Social / Cliente</th>
-                                    <th class="px-4 py-3">Data Base</th>
-                                    <th class="px-4 py-3">Semana Base</th>
-                                    <th class="px-4 py-3">Mês</th>
-                                    <th class="px-4 py-3">Semestre</th>
-                                    <th class="px-4 py-3">Ano</th>
-                                    <th class="px-4 py-3">Canal (Origem)</th>
-                                    <th class="px-4 py-3">Urgência</th>
-                                    <th class="px-4 py-3">Analista</th>
-                                    <th class="px-4 py-3">Aging (Dias)</th>
-                                    <th class="px-4 py-3 text-center">Status SLA</th>
-                                    <th class="px-4 py-3">Status Fila</th>
-                                    <th class="px-4 py-3">Espera</th>
-                                    <th class="px-4 py-3">Espera Chat</th>
-                                    <th class="px-4 py-3">Duração Chat</th>
-                                    <th class="px-4 py-3">Causa Raiz</th>
-                                    <th class="px-4 py-3 text-center">FCR</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-base-body" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
+                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompDiario"></canvas></div>
                 </div>
+
+                <!-- COMPARATIVO SEMANAL -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-week text-purple-500 mr-2"></i> Comparativo Semanal (WoW)</h3>
+                        <div class="flex flex-wrap gap-2 items-center print-hide">
+                            <select id="compSemA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[150px]" onchange="calcularComparativos()"></select>
+                            <span class="text-slate-400 font-bold text-xs">VS</span>
+                            <select id="compSemB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[150px]" onchange="calcularComparativos()"></select>
+                            
+                            <select id="compSemC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[150px]" onchange="calcularComparativos()"></select>
+                            
+                            <button id="btnAddSem" onclick="addPeriodo('Sem')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
+                            <button id="btnRemoveSem" onclick="removePeriodo('Sem')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
+                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemanal"></canvas></div>
+                </div>
+
+                <!-- COMPARATIVO MENSAL -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-days text-blue-500 mr-2"></i> Comparativo Mensal (MoM)</h3>
+                        <div class="flex flex-wrap gap-2 items-center print-hide">
+                            <select id="compMesA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            <span class="text-slate-400 font-bold text-xs">VS</span>
+                            <select id="compMesB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            
+                            <select id="compMesC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            
+                            <button id="btnAddMes" onclick="addPeriodo('Mes')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
+                            <button id="btnRemoveMes" onclick="removePeriodo('Mes')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
+                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompMensal"></canvas></div>
+                </div>
+
+                <!-- COMPARATIVO SEMESTRAL -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar-minus text-orange-500 mr-2"></i> Comparativo Semestral</h3>
+                        <div class="flex flex-wrap gap-2 items-center print-hide">
+                            <select id="compSemestreA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[120px]" onchange="calcularComparativos()"></select>
+                            <span class="text-slate-400 font-bold text-xs">VS</span>
+                            <select id="compSemestreB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[120px]" onchange="calcularComparativos()"></select>
+                            
+                            <select id="compSemestreC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[120px]" onchange="calcularComparativos()"></select>
+                            
+                            <button id="btnAddSemestre" onclick="addPeriodo('Semestre')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
+                            <button id="btnRemoveSemestre" onclick="removePeriodo('Semestre')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
+                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemestral"></canvas></div>
+                </div>
+
+                <!-- COMPARATIVO ANUAL -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 print-break-inside">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-calendar text-red-500 mr-2"></i> Comparativo Anual (YoY)</h3>
+                        <div class="flex flex-wrap gap-2 items-center print-hide">
+                            <select id="compAnoA" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            <span class="text-slate-400 font-bold text-xs">VS</span>
+                            <select id="compAnoB" class="bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            
+                            <select id="compAnoC" class="hidden bg-slate-50 border border-slate-300 rounded p-1.5 md:p-2 text-xs md:text-sm font-medium w-full sm:w-auto min-w-[100px]" onchange="calcularComparativos()"></select>
+                            
+                            <button id="btnAddAno" onclick="addPeriodo('Ano')" class="text-slate-400 hover:text-blue-500 transition ml-1" title="Adicionar período ao gráfico"><i class="fa-solid fa-circle-plus text-lg"></i></button>
+                            <button id="btnRemoveAno" onclick="removePeriodo('Ano')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
+                    <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompAnual"></canvas></div>
+                </div>
+
             </div>
 
-            <!-- TAB 5: LEGENDA DE MÉTRICAS -->
+            <!-- TAB 4: LEGENDA DE MÉTRICAS -->
             <div id="visao-legendas" class="tab-content w-full">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-8 print-break-inside">
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-2 border-b border-slate-100 pb-4">Dicionário de Indicadores</h2>
@@ -510,6 +478,44 @@
                     </div>
                 </div>
             </div>
+
+            <!-- TAB 5: BASE DE DADOS -->
+            <div id="base-dados" class="tab-content w-full">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px] md:h-[600px] w-full print-break-inside">
+                    <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50">
+                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-list-ul text-blue-500 mr-2"></i> Base Analítica (Sincronizada)</h3>
+                        <span id="contador-base" class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider self-start md:self-auto">0 resultados</span>
+                    </div>
+                    <div class="flex-1 overflow-auto scrollbar-thin">
+                        <table class="w-full text-sm text-left whitespace-nowrap">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-4 py-3">ID</th>
+                                    <th class="px-4 py-3">Razão Social / Cliente</th>
+                                    <th class="px-4 py-3">Data Base</th>
+                                    <th class="px-4 py-3">Semana Base</th>
+                                    <th class="px-4 py-3">Mês</th>
+                                    <th class="px-4 py-3">Semestre</th>
+                                    <th class="px-4 py-3">Ano</th>
+                                    <th class="px-4 py-3">Canal (Origem)</th>
+                                    <th class="px-4 py-3">Urgência</th>
+                                    <th class="px-4 py-3">Analista</th>
+                                    <th class="px-4 py-3">Aging (Dias)</th>
+                                    <th class="px-4 py-3 text-center">Status SLA</th>
+                                    <th class="px-4 py-3">Status Fila</th>
+                                    <th class="px-4 py-3">Espera</th>
+                                    <th class="px-4 py-3">Espera Chat</th>
+                                    <th class="px-4 py-3">Duração Chat</th>
+                                    <th class="px-4 py-3">Causa Raiz</th>
+                                    <th class="px-4 py-3 text-center">FCR</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-base-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -673,10 +679,10 @@
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v27') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v29') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v27');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v29');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -706,7 +712,7 @@
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v27', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v29', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
@@ -819,7 +825,7 @@
         }
 
         function buildDeltaCard(t, vA, vB, format, typeConfig) {
-            let diff = vA - vB; 
+            let diff = vB - vA; 
             let cor = diff === 0 ? 'text-slate-400' : (diff > 0 ? 'text-emerald-500' : 'text-red-500');
             if(t.includes('MTTR') || t.includes('Volume') || t.includes('Aging') || t.includes('Violado')) {
                 cor = diff === 0 ? 'text-slate-400' : (diff > 0 ? 'text-red-500' : 'text-emerald-500');
@@ -834,10 +840,10 @@
                             <i class="fa-solid ${typeConfig.ic} ${typeConfig.txt} opacity-50 text-sm md:text-base shrink-0"></i>
                         </div>
                         <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                            <h4 class="text-xl md:text-2xl font-black ${typeConfig.txt}">${vA.toFixed(1)}${format}</h4>
+                            <h4 class="text-xl md:text-2xl font-black ${typeConfig.txt}">${vB.toFixed(1)}${format}</h4>
                             <span class="text-[9px] md:text-xs font-bold ${cor}">${diffStr}</span>
                         </div>
-                        <p class="text-[9px] text-slate-400 mt-1">vs ${vB.toFixed(1)}${format}</p>
+                        <p class="text-[9px] text-slate-400 mt-1">vs ${vA.toFixed(1)}${format}</p>
                     </div>`;
         }
 
@@ -997,9 +1003,10 @@
             const tabAtual = document.querySelector('.tab-content.active').id;
             let filtroTexto = "";
             if (tabAtual === 'visao-geral' || tabAtual === 'base-dados') {
+                const ano = document.getElementById('filterAno').value;
                 const mes = document.getElementById('filterMes').value;
                 const dia = document.getElementById('filterDia').value;
-                filtroTexto = `Filtro: ${mes !== 'ALL' ? mes : 'Todos os Meses'}`;
+                filtroTexto = `Filtro: ${ano !== 'ALL' ? ano : 'Todos os Anos'} | ${mes !== 'ALL' ? mes : 'Todos os Meses'}`;
                 if (dia !== 'ALL') filtroTexto += ` | Dia: ${dia.split('-').reverse().join('/')}`;
             } else if (tabAtual === 'visao-analista-diario') {
                 const analista = document.getElementById('selectAnalista').value;
@@ -1079,10 +1086,10 @@
             
             const titles = {
                 'visao-geral': 'Visão Geral & KPIs', 
-                'visao-comparativo': 'Painel de Comparativos', 
                 'visao-analista-diario': 'Acompanhamento Diário do Analista', 
-                'base-dados': 'Extração Analítica Movidesk',
-                'visao-legendas': 'Dicionário de Métricas'
+                'visao-comparativo': 'Painel de Comparativos', 
+                'visao-legendas': 'Dicionário de Métricas',
+                'base-dados': 'Extração Analítica Movidesk'
             };
             document.getElementById('header-title').innerText = titles[tabId];
             if(window.innerWidth <= 768) toggleMenu();
@@ -1091,33 +1098,58 @@
 
         function addPeriodo(tipo) {
             const selC = document.getElementById('comp' + tipo + 'C');
-            const selD = document.getElementById('comp' + tipo + 'D');
             const btnRem = document.getElementById('btnRemove' + tipo);
+            const btnAdd = document.getElementById('btnAdd' + tipo);
             if (selC.classList.contains('hidden')) {
-                selC.classList.remove('hidden'); btnRem.classList.remove('hidden');
-            } else if (selD.classList.contains('hidden')) {
-                selD.classList.remove('hidden');
+                selC.classList.remove('hidden'); 
+                btnRem.classList.remove('hidden');
+                btnAdd.classList.add('hidden');
             }
             calcularComparativos();
         }
 
         function removePeriodo(tipo) {
             const selC = document.getElementById('comp' + tipo + 'C');
-            const selD = document.getElementById('comp' + tipo + 'D');
             const btnRem = document.getElementById('btnRemove' + tipo);
-            if (!selD.classList.contains('hidden')) {
-                selD.classList.add('hidden');
-            } else if (!selC.classList.contains('hidden')) {
-                selC.classList.add('hidden'); btnRem.classList.add('hidden');
+            const btnAdd = document.getElementById('btnAdd' + tipo);
+            if (!selC.classList.contains('hidden')) {
+                selC.classList.add('hidden'); 
+                btnRem.classList.add('hidden');
+                btnAdd.classList.remove('hidden');
             }
             calcularComparativos();
         }
 
+        function onAnoChange() {
+            const ano = document.getElementById('filterAno').value;
+            const meses = [...new Set(rawData.map(d => d.Mes_Criacao).concat(rawData.map(d => d.Mes_Resolucao)))].filter(m=>m).sort().reverse();
+            const mesesFiltrados = ano === "ALL" ? meses : meses.filter(m => m.startsWith(ano));
+            
+            const df = new Date();
+            df.setDate(df.getDate() - 90);
+            const cutoffDateIso = getLocalIsoDate(df);
+
+            const sel = document.getElementById('filterMes');
+            sel.innerHTML = '<option value="ALL">Todos os Meses</option>';
+            mesesFiltrados.forEach(i => {
+                let label = i;
+                if (i + "-01" < cutoffDateIso) {
+                    label += " (parcial)";
+                }
+                sel.innerHTML += `<option value="${escapeHTML(i)}">${escapeHTML(label)}</option>`;
+            });
+            
+            if (mesesFiltrados.length > 0) sel.value = mesesFiltrados[0];
+            else sel.value = "ALL";
+            
+            onMesChange();
+        }
+
         function populateFilters() {
+            const anos = [...new Set(rawData.map(d => d.Ano_Criacao).concat(rawData.map(d => d.Ano_Resolucao)))].filter(a=>a).sort().reverse();
             const meses = [...new Set(rawData.map(d => d.Mes_Criacao).concat(rawData.map(d => d.Mes_Resolucao)))].filter(m=>m).sort().reverse();
             const semanas = [...new Set(rawData.map(d => d.Semana_Criacao).concat(rawData.map(d => d.Semana_Resolucao)))].filter(s=>s).sort().reverse();
             const semestres = [...new Set(rawData.map(d => d.Semestre_Criacao).concat(rawData.map(d => d.Semestre_Resolucao)))].filter(s=>s).sort().reverse();
-            const anos = [...new Set(rawData.map(d => d.Ano_Criacao).concat(rawData.map(d => d.Ano_Resolucao)))].filter(a=>a).sort().reverse();
             const analistas = [...new Set(rawData.map(d => d.Analista))].sort();
             const diasAll = [...new Set(rawData.map(d => d.Data_Criacao).concat(rawData.map(d => d.Data_Resolucao)))].filter(d=>d).sort().reverse();
             
@@ -1158,32 +1190,40 @@
                 });
             };
 
-            renderSelectMeses(meses, 'filterMes', true);
+            renderSelect(anos, 'filterAno', true);
+            if(anos.length > 0) document.getElementById('filterAno').value = anos[0];
             
-            renderSelect(anos, 'compAnoA'); renderSelect(anos, 'compAnoB'); renderSelect(anos, 'compAnoC'); renderSelect(anos, 'compAnoD');
-            renderSelect(semestres, 'compSemestreA'); renderSelect(semestres, 'compSemestreB'); renderSelect(semestres, 'compSemestreC'); renderSelect(semestres, 'compSemestreD');
-            renderSelectMeses(meses, 'compMesA'); renderSelectMeses(meses, 'compMesB'); renderSelectMeses(meses, 'compMesC'); renderSelectMeses(meses, 'compMesD');
-            renderSelect(semanas, 'compSemA', false, true); renderSelect(semanas, 'compSemB', false, true); renderSelect(semanas, 'compSemC', false, true); renderSelect(semanas, 'compSemD', false, true);
+            const anoSel = anos.length > 0 ? anos[0] : "ALL";
+            const mesesFiltrados = anoSel === "ALL" ? meses : meses.filter(m => m.startsWith(anoSel));
+            
+            const selMes = document.getElementById('filterMes');
+            selMes.innerHTML = '<option value="ALL">Todos os Meses</option>';
+            mesesFiltrados.forEach(i => {
+                let label = i;
+                if (i + "-01" < cutoffDateIso) label += " (parcial)";
+                selMes.innerHTML += `<option value="${escapeHTML(i)}">${escapeHTML(label)}</option>`;
+            });
+            if(mesesFiltrados.length > 0) selMes.value = mesesFiltrados[0];
+
+            renderSelect(anos, 'compAnoA'); renderSelect(anos, 'compAnoB'); renderSelect(anos, 'compAnoC');
+            renderSelect(semestres, 'compSemestreA'); renderSelect(semestres, 'compSemestreB'); renderSelect(semestres, 'compSemestreC');
+            renderSelectMeses(meses, 'compMesA'); renderSelectMeses(meses, 'compMesB'); renderSelectMeses(meses, 'compMesC');
+            renderSelect(semanas, 'compSemA', false, true); renderSelect(semanas, 'compSemB', false, true); renderSelect(semanas, 'compSemC', false, true);
             renderSelect(analistas, 'selectAnalista');
-            renderDiaOptions(diasAll, 'compDiaA'); renderDiaOptions(diasAll, 'compDiaB'); renderDiaOptions(diasAll, 'compDiaC'); renderDiaOptions(diasAll, 'compDiaD');
+            renderDiaOptions(diasAll, 'compDiaA'); renderDiaOptions(diasAll, 'compDiaB'); renderDiaOptions(diasAll, 'compDiaC');
             
-            if(anos.length >= 2) document.getElementById('compAnoB').value = anos[1];
-            if(semestres.length >= 2) document.getElementById('compSemestreB').value = semestres[1];
-            if(meses.length >= 2) document.getElementById('compMesB').value = meses[1];
-            if(semanas.length >= 2) document.getElementById('compSemB').value = semanas[1];
-            if(diasAll.length >= 2) document.getElementById('compDiaB').value = diasAll[1]; 
+            // Lógica crescente para default: A é o antigo (1), B é o novo (0). O Gráfico vai exibir da esquerda para direita: 2025 -> 2026
+            if(anos.length >= 2) { document.getElementById('compAnoA').value = anos[1]; document.getElementById('compAnoB').value = anos[0]; }
+            if(semestres.length >= 2) { document.getElementById('compSemestreA').value = semestres[1]; document.getElementById('compSemestreB').value = semestres[0]; }
+            if(meses.length >= 2) { document.getElementById('compMesA').value = meses[1]; document.getElementById('compMesB').value = meses[0]; }
+            if(semanas.length >= 2) { document.getElementById('compSemA').value = semanas[1]; document.getElementById('compSemB').value = semanas[0]; }
+            if(diasAll.length >= 2) { document.getElementById('compDiaA').value = diasAll[1]; document.getElementById('compDiaB').value = diasAll[0]; }
             
             if(anos.length >= 3) document.getElementById('compAnoC').value = anos[2];
             if(semestres.length >= 3) document.getElementById('compSemestreC').value = semestres[2];
             if(meses.length >= 3) document.getElementById('compMesC').value = meses[2];
             if(semanas.length >= 3) document.getElementById('compSemC').value = semanas[2];
             if(diasAll.length >= 3) document.getElementById('compDiaC').value = diasAll[2]; 
-
-            if(anos.length >= 4) document.getElementById('compAnoD').value = anos[3];
-            if(semestres.length >= 4) document.getElementById('compSemestreD').value = semestres[3];
-            if(meses.length >= 4) document.getElementById('compMesD').value = meses[3];
-            if(semanas.length >= 4) document.getElementById('compSemD').value = semanas[3];
-            if(diasAll.length >= 4) document.getElementById('compDiaD').value = diasAll[3]; 
         }
 
         function onMesChange() {
@@ -1192,8 +1232,13 @@
         }
 
         function updateDiaDropdown() {
+            const ano = document.getElementById('filterAno').value;
             const mes = document.getElementById('filterMes').value;
-            const dadosBase = mes === "ALL" ? rawData : rawData.filter(d => d.Mes_Criacao === mes || d.Mes_Resolucao === mes);
+            
+            let dadosBase = rawData;
+            if (ano !== "ALL") dadosBase = dadosBase.filter(d => d.Ano_Criacao === ano || d.Ano_Resolucao === ano);
+            if (mes !== "ALL") dadosBase = dadosBase.filter(d => d.Mes_Criacao === mes || d.Mes_Resolucao === mes);
+            
             const dias = [...new Set(dadosBase.map(d => d.Data_Criacao).concat(dadosBase.map(d => d.Data_Resolucao)))].filter(d=>d).sort().reverse();
             
             const selDia = document.getElementById('filterDia');
@@ -1218,13 +1263,15 @@
 
         function applyFilters() {
             updateDiaDropdown();
+            const ano = document.getElementById('filterAno').value;
             const mes = document.getElementById('filterMes').value;
             const dia = document.getElementById('filterDia').value;
             
             filteredData = rawData.filter(d => {
-                if (mes === "ALL" && dia === "ALL") return true;
-                if (dia !== "ALL") return (d.Data_Criacao === dia || d.Data_Resolucao === dia);
-                return (d.Mes_Criacao === mes || d.Mes_Resolucao === mes);
+                let okAno = (ano === "ALL") || (d.Ano_Criacao === ano || d.Ano_Resolucao === ano);
+                let okMes = (mes === "ALL") || (d.Mes_Criacao === mes || d.Mes_Resolucao === mes);
+                let okDia = (dia === "ALL") || (d.Data_Criacao === dia || d.Data_Resolucao === dia);
+                return okAno && okMes && okDia;
             });
             
             calculateGlobalKPIs();
@@ -1317,9 +1364,10 @@
         }
 
         function calculateGlobalKPIs() {
+            const ano = document.getElementById('filterAno').value;
             const mes = document.getElementById('filterMes').value;
             const dia = document.getElementById('filterDia').value;
-            const m = calcMetrics(rawData, mes, dia);
+            const m = calcMetrics(rawData, mes, dia, null, null, ano);
 
             const csatFailed = !document.getElementById('csat-warning').classList.contains('hidden');
             let aderenciaVal = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
@@ -1365,10 +1413,11 @@
             const analistaSel = document.getElementById('selectAnalista').value;
             if(!analistaSel) return;
 
+            const ano = document.getElementById('filterAno').value;
             const mes = document.getElementById('filterMes').value;
             const dia = document.getElementById('filterDia').value;
             const dadosA = rawData.filter(d => d.Analista === analistaSel);
-            const m = calcMetrics(dadosA, mes, dia);
+            const m = calcMetrics(dadosA, mes, dia, null, null, ano);
 
             const csatFailed = !document.getElementById('csat-warning').classList.contains('hidden');
             let aderenciaVal = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
@@ -1385,6 +1434,7 @@
             }
 
             document.getElementById('cards-analista').innerHTML = 
+                buildCardUI('Volume', m.recebidos, getCardConfig('Volume')) +
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
                 buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
@@ -1408,6 +1458,7 @@
                 buildChatCardUI('Tempo Médio Espera', m.chat.mediaEspera, m.chat.nEspera);
 
             let baseA = dadosA;
+            if(ano !== "ALL") baseA = baseA.filter(d => d.Ano_Criacao === ano);
             if(mes !== "ALL") baseA = baseA.filter(d => d.Mes_Criacao === mes);
             if(dia !== "ALL") baseA = baseA.filter(d => d.Data_Criacao === dia);
             
@@ -1437,9 +1488,10 @@
 
             const motA = [...new Set(pendentes.map(d => d.Motivo_Espera))];
             if(charts['cbA']) charts['cbA'].destroy();
-            charts['cbA'] = new Chart(document.getElementById('chartBacklogAnalista'), { type: 'doughnut', data: { labels: motA, datasets: [{ data: motA.map(m => pendentes.filter(d => d.Motivo_Espera === m).length), backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4'] }] }, options: donutOptions });
+            charts['cbA'] = new Chart(document.getElementById('chartBacklogAnalista'), { type: 'doughnut', data: { labels: motA, datasets: [{ data: motA.map(m => pendentes.filter(d => d.Motivo_Espera === m).length), backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#10b981', '#3b82f6', '#f43f5e', '#84cc16', '#64748b', '#d946ef', '#14b8a6', '#f97316'] }] }, options: donutOptions });
 
             let baseOrigem = dadosA;
+            if(ano !== "ALL") baseOrigem = baseOrigem.filter(d => d.Ano_Criacao === ano);
             if(mes !== "ALL") baseOrigem = baseOrigem.filter(d => d.Mes_Criacao === mes);
             const origensA = [...new Set(baseOrigem.map(d => d.Origem))].filter(o => o);
             if(charts['corigA']) charts['corigA'].destroy();
@@ -1447,10 +1499,12 @@
         }
 
         function renderChartsGlobais() {
+            const ano = document.getElementById('filterAno').value;
             const mes = document.getElementById('filterMes').value;
             const dia = document.getElementById('filterDia').value;
             
             let baseRecebidos = rawData;
+            if (ano !== "ALL") baseRecebidos = baseRecebidos.filter(d => d.Ano_Criacao === ano);
             if (mes !== "ALL") baseRecebidos = baseRecebidos.filter(d => d.Mes_Criacao === mes);
             if (dia !== "ALL") baseRecebidos = baseRecebidos.filter(d => d.Data_Criacao === dia);
 
@@ -1474,13 +1528,14 @@
             const bk = baseRecebidos.filter(d => !d.IsEncerrado);
             const esp = [...new Set(bk.map(d => d.Motivo_Espera))];
             if(charts['cesp']) charts['cesp'].destroy();
-            charts['cesp'] = new Chart(document.getElementById('chartEspera'), { type: 'pie', data: { labels: esp, datasets: [{ data: esp.map(e => bk.filter(d => d.Motivo_Espera === e).length), backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#64748b'] }] }, options: donutOptions });
+            charts['cesp'] = new Chart(document.getElementById('chartEspera'), { type: 'pie', data: { labels: esp, datasets: [{ data: esp.map(e => bk.filter(d => d.Motivo_Espera === e).length), backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#10b981', '#3b82f6', '#f43f5e', '#84cc16', '#64748b', '#d946ef', '#14b8a6', '#f97316'] }] }, options: donutOptions });
 
             const origensG = [...new Set(baseRecebidos.map(d => d.Origem))].filter(o => o);
             if(charts['corigG']) charts['corigG'].destroy();
             charts['corigG'] = new Chart(document.getElementById('chartOrigemGlobal'), { type: 'doughnut', data: { labels: origensG, datasets: [{ data: origensG.map(o => baseRecebidos.filter(d => d.Origem === o).length), backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#64748b'] }] }, options: donutOptions });
 
             let baseCausa = rawData.filter(d => d.IsResolvido);
+            if(ano !== "ALL") baseCausa = baseCausa.filter(d => d.Ano_Resolucao === ano);
             if(mes !== "ALL") baseCausa = baseCausa.filter(d => d.Mes_Resolucao === mes);
             const cau = [...new Set(baseCausa.map(d => d.Causa_Raiz))].filter(c => c && c !== "Não classificado");
             if(charts['ccr']) charts['ccr'].destroy();
@@ -1505,12 +1560,13 @@
 
         function renderTabelasGerais() {
             const analistas = [...new Set(rawData.map(d => d.Analista))].sort();
+            const ano = document.getElementById('filterAno').value;
             const mes = document.getElementById('filterMes').value;
             const dia = document.getElementById('filterDia').value;
             const csatFailed = !document.getElementById('csat-warning').classList.contains('hidden');
 
             document.getElementById('table-comparativo-equipe').innerHTML = analistas.map(ana => {
-                let m = calcMetrics(rawData.filter(d => d.Analista === ana), mes, dia);
+                let m = calcMetrics(rawData.filter(d => d.Analista === ana), mes, dia, null, null, ano);
                 let csatAdFormat = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
                 let csatAdSub = csatFailed ? '' : `<br><span class="text-[9px] text-slate-400">${m.csatRespondidos}/${m.csatBase}</span>`;
                 
@@ -1561,15 +1617,15 @@
                 const metA = calcMetrics(rawData, null, null, null, null, valA); const metB = calcMetrics(rawData, null, null, null, null, valB);
                 
                 document.getElementById('cards-delta-anual').innerHTML = 
-                    buildDeltaCard('Volume', metA.recebidos, metB.recebidos, '', getCardConfig('Volume')) + 
-                    buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
-                    buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
-                    buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
-                    buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
-                    buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
-                    buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
-                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
+                    buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
+                    buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
+                    buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
+                    buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
+                    buildDeltaCard('FCR', metB.fcrRate, metA.fcrRate, '%', getCardConfig('FCR')) + 
+                    buildDeltaCard('MTTR', metB.mttr, metA.mttr, 'h', getCardConfig('MTTR')) + 
+                    buildDeltaCard('CSAT', metB.csat, metA.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsAno = [
                     { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#ef4444' }, 
@@ -1579,11 +1635,6 @@
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, null, null, null, null, selC.value);
                     dsAno.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#3b82f6' });
-                }
-                const selD = document.getElementById('compAnoD');
-                if(!selD.classList.contains('hidden') && selD.value) {
-                    const metD = calcMetrics(rawData, null, null, null, null, selD.value);
-                    dsAno.push({ label: selD.value, data: [metD.recebidos, metD.resolvidos, metD.backlog], backgroundColor: '#f59e0b' });
                 }
 
                 if(charts['cca']) charts['cca'].destroy();
@@ -1595,15 +1646,15 @@
                 const metA = calcMetrics(rawData, null, null, null, valA, null); const metB = calcMetrics(rawData, null, null, null, valB, null);
                 
                 document.getElementById('cards-delta-semestral').innerHTML = 
-                    buildDeltaCard('Volume', metA.recebidos, metB.recebidos, '', getCardConfig('Volume')) + 
-                    buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
-                    buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
-                    buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
-                    buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
-                    buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
-                    buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
-                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
+                    buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
+                    buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
+                    buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
+                    buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
+                    buildDeltaCard('FCR', metB.fcrRate, metA.fcrRate, '%', getCardConfig('FCR')) + 
+                    buildDeltaCard('MTTR', metB.mttr, metA.mttr, 'h', getCardConfig('MTTR')) + 
+                    buildDeltaCard('CSAT', metB.csat, metA.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsSemestre = [
                     { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#f97316' }, 
@@ -1613,11 +1664,6 @@
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, null, null, null, selC.value, null);
                     dsSemestre.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#14b8a6' });
-                }
-                const selD = document.getElementById('compSemestreD');
-                if(!selD.classList.contains('hidden') && selD.value) {
-                    const metD = calcMetrics(rawData, null, null, null, selD.value, null);
-                    dsSemestre.push({ label: selD.value, data: [metD.recebidos, metD.resolvidos, metD.backlog], backgroundColor: '#a855f7' });
                 }
 
                 if(charts['ccsem']) charts['ccsem'].destroy();
@@ -1629,15 +1675,15 @@
                 const metA = calcMetrics(rawData, valA, null, null, null, null); const metB = calcMetrics(rawData, valB, null, null, null, null);
 
                 document.getElementById('cards-delta-mensal').innerHTML = 
-                    buildDeltaCard('Volume', metA.recebidos, metB.recebidos, '', getCardConfig('Volume')) + 
-                    buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
-                    buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
-                    buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
-                    buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
-                    buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
-                    buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
-                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
+                    buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
+                    buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
+                    buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
+                    buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
+                    buildDeltaCard('FCR', metB.fcrRate, metA.fcrRate, '%', getCardConfig('FCR')) + 
+                    buildDeltaCard('MTTR', metB.mttr, metA.mttr, 'h', getCardConfig('MTTR')) + 
+                    buildDeltaCard('CSAT', metB.csat, metA.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsMes = [
                     { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#3b82f6' }, 
@@ -1647,11 +1693,6 @@
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, selC.value, null, null, null, null);
                     dsMes.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#10b981' });
-                }
-                const selD = document.getElementById('compMesD');
-                if(!selD.classList.contains('hidden') && selD.value) {
-                    const metD = calcMetrics(rawData, selD.value, null, null, null, null);
-                    dsMes.push({ label: selD.value, data: [metD.recebidos, metD.resolvidos, metD.backlog], backgroundColor: '#ec4899' });
                 }
 
                 if(charts['ccm']) charts['ccm'].destroy();
@@ -1663,15 +1704,15 @@
                 const metA = calcMetrics(rawData, null, null, valA, null, null); const metB = calcMetrics(rawData, null, null, valB, null, null);
                 
                 document.getElementById('cards-delta-semanal').innerHTML = 
-                    buildDeltaCard('Volume', metA.recebidos, metB.recebidos, '', getCardConfig('Volume')) + 
-                    buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
-                    buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
-                    buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
-                    buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
-                    buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
-                    buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
-                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
+                    buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
+                    buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
+                    buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
+                    buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
+                    buildDeltaCard('FCR', metB.fcrRate, metA.fcrRate, '%', getCardConfig('FCR')) + 
+                    buildDeltaCard('MTTR', metB.mttr, metA.mttr, 'h', getCardConfig('MTTR')) + 
+                    buildDeltaCard('CSAT', metB.csat, metA.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
 
                 let dsSemana = [
                     { label: getLabelGrafico(valA, 'Sem'), data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#8b5cf6' }, 
@@ -1681,11 +1722,6 @@
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, null, null, selC.value, null, null);
                     dsSemana.push({ label: getLabelGrafico(selC.value, 'Sem'), data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#f59e0b' });
-                }
-                const selD = document.getElementById('compSemD');
-                if(!selD.classList.contains('hidden') && selD.value) {
-                    const metD = calcMetrics(rawData, null, null, selD.value, null, null);
-                    dsSemana.push({ label: getLabelGrafico(selD.value, 'Sem'), data: [metD.recebidos, metD.resolvidos, metD.backlog], backgroundColor: '#06b6d4' });
                 }
                 
                 if(charts['ccs']) charts['ccs'].destroy();
@@ -1697,15 +1733,15 @@
                 const metA = calcMetrics(rawData, null, valA, null, null, null); const metB = calcMetrics(rawData, null, valB, null, null, null);
                 
                 document.getElementById('cards-delta-diario').innerHTML = 
-                    buildDeltaCard('Volume', metA.recebidos, metB.recebidos, '', getCardConfig('Volume')) + 
-                    buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
-                    buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
-                    buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
-                    buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
-                    buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
-                    buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
-                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
+                    buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
+                    buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
+                    buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
+                    buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
+                    buildDeltaCard('FCR', metB.fcrRate, metA.fcrRate, '%', getCardConfig('FCR')) + 
+                    buildDeltaCard('MTTR', metB.mttr, metA.mttr, 'h', getCardConfig('MTTR')) + 
+                    buildDeltaCard('CSAT', metB.csat, metA.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
 
                 let dsDia = [
                     { label: getLabelGrafico(valA, 'Dia'), data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#f59e0b' }, 
@@ -1715,11 +1751,6 @@
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, null, selC.value, null, null, null);
                     dsDia.push({ label: getLabelGrafico(selC.value, 'Dia'), data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#6366f1' });
-                }
-                const selD = document.getElementById('compDiaD');
-                if(!selD.classList.contains('hidden') && selD.value) {
-                    const metD = calcMetrics(rawData, null, selD.value, null, null, null);
-                    dsDia.push({ label: getLabelGrafico(selD.value, 'Dia'), data: [metD.recebidos, metD.resolvidos, metD.backlog], backgroundColor: '#f43f5e' });
                 }
                 
                 if(charts['ccd']) charts['ccd'].destroy();
