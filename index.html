@@ -1717,37 +1717,29 @@
                 const cliente = ticketClientMap.get(tId) || "Cliente";
                 const dataResp = item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-';
                 
-                const pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
+                let pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
                 
                 const tipo = Number(item.type || item.questionType);
                 const valorReal = item.response ?? item.value ?? item.rating;
                 const valNum = Number(valorReal);
                 
                 let notaTexto = '-';
-                let comentario = item.comments || item.comment || item.justification || item.feedback || item.observation || '-';
-
-                if (isNaN(valNum) && valorReal && typeof valorReal === 'string') {
-                    if (comentario === '-' || comentario === valorReal) {
-                        comentario = valorReal;
-                    } else {
-                        comentario = valorReal + " | " + comentario;
+                let comentario = item.commentary || item.comments || item.comment || item.justification || item.feedback || item.observation || '-';
+                
+                if (tipo === 3 || tipo === 4 || isNaN(valNum)) {
+                    if (comentario === '-' && notaTexto !== '-') {
+                        comentario = notaTexto;
+                        notaTexto = '-';
                     }
-                    notaTexto = '-';
-                } else {
-                    if (tipo === 1) { 
-                        if (valNum === 1) notaTexto = "5 - Satisfeito";
-                        else if (valNum === 2) notaTexto = "1 - Insatisfeito";
-                        else notaTexto = String(valorReal);
-                    } else if (tipo === 2 || (!isNaN(valNum) && valNum >= 1 && valNum <= 5)) { 
-                        if (valNum === 5) notaTexto = "5 - Muito Satisfeito";
-                        else if (valNum === 4) notaTexto = "4 - Satisfeito";
-                        else if (valNum === 3) notaTexto = "3 - Neutro";
-                        else if (valNum === 2) notaTexto = "2 - Insatisfeito";
-                        else if (valNum === 1) notaTexto = "1 - Muito Insatisfeito";
-                        else notaTexto = String(valorReal);
-                    } else {
-                        notaTexto = valorReal !== undefined && valorReal !== null ? String(valorReal) : '-';
-                    }
+                } else if (tipo === 1) { 
+                    if (valNum === 1) notaTexto = "5 - Satisfeito";
+                    else if (valNum === 2) notaTexto = "1 - Insatisfeito";
+                } else if (tipo === 2) { 
+                    if (valNum === 5) notaTexto = "5 - Muito Satisfeito";
+                    else if (valNum === 4) notaTexto = "4 - Satisfeito";
+                    else if (valNum === 3) notaTexto = "3 - Neutro";
+                    else if (valNum === 2) notaTexto = "2 - Insatisfeito";
+                    else if (valNum === 1) notaTexto = "1 - Muito Insatisfeito";
                 }
 
                 return `
@@ -1938,37 +1930,27 @@
                     const ticketOwnerMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Analista]));
                     const ticketClientMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Nome_Cliente]));
                     
-                    const pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
+                    let pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
                     
                     const tipo = Number(item.type || item.questionType);
-                    const valorReal = item.response ?? item.value ?? item.rating;
-                    const valNum = Number(valorReal);
+                    const val = Number(item.response || item.value || item.rating);
+                    let notaTexto = item.response || item.value || item.rating || '-';
+                    let comentario = item.commentary || item.comments || item.comment || item.justification || item.feedback || item.observation || '-';
                     
-                    let notaTexto = '-';
-                    let comentario = item.comments || item.comment || item.justification || item.feedback || item.observation || '-';
-
-                    if (isNaN(valNum) && valorReal && typeof valorReal === 'string') {
-                        if (comentario === '-' || comentario === valorReal) {
-                            comentario = valorReal;
-                        } else {
-                            comentario = valorReal + " | " + comentario;
+                    if (tipo === 3 || tipo === 4 || isNaN(val)) {
+                        if (comentario === '-' && notaTexto !== '-') {
+                            comentario = notaTexto;
+                            notaTexto = '-';
                         }
-                        notaTexto = '-';
-                    } else {
-                        if (tipo === 1) { 
-                            if (valNum === 1) notaTexto = "5 - Satisfeito";
-                            else if (valNum === 2) notaTexto = "1 - Insatisfeito";
-                            else notaTexto = String(valorReal);
-                        } else if (tipo === 2 || (!isNaN(valNum) && valNum >= 1 && valNum <= 5)) { 
-                            if (valNum === 5) notaTexto = "5 - Muito Satisfeito";
-                            else if (valNum === 4) notaTexto = "4 - Satisfeito";
-                            else if (valNum === 3) notaTexto = "3 - Neutro";
-                            else if (valNum === 2) notaTexto = "2 - Insatisfeito";
-                            else if (valNum === 1) notaTexto = "1 - Muito Insatisfeito";
-                            else notaTexto = String(valorReal);
-                        } else {
-                            notaTexto = valorReal !== undefined && valorReal !== null ? String(valorReal) : '-';
-                        }
+                    } else if (tipo === 1) { 
+                        if (val === 1) notaTexto = "5 - Satisfeito";
+                        else if (val === 2) notaTexto = "1 - Insatisfeito";
+                    } else if (tipo === 2) { 
+                        if (val === 5) notaTexto = "5 - Muito Satisfeito";
+                        else if (val === 4) notaTexto = "4 - Satisfeito";
+                        else if (val === 3) notaTexto = "3 - Neutro";
+                        else if (val === 2) notaTexto = "2 - Insatisfeito";
+                        else if (val === 1) notaTexto = "1 - Muito Insatisfeito";
                     }
 
                     return {
