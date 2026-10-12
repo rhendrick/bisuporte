@@ -283,7 +283,7 @@
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto scrollbar-thin">
                         <table class="w-full text-sm text-left whitespace-nowrap">
                             <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b">
-                                <tr><th class="px-4 md:px-6 py-4">Analista</th><th class="px-4 py-4 text-center">Resolvidos</th><th class="px-4 py-4 text-center">Backlog Retido</th><th class="px-4 py-4 text-center">Aging Médio</th><th class="px-4 py-4 text-center">SLA Média</th><th class="px-4 py-4 text-center">SLA Violado</th><th class="px-4 py-4 text-center">FCR</th><th class="px-4 py-4 text-center">MTTR Médio</th><th class="px-4 py-4 text-center">CSAT</th><th class="px-4 py-4 text-center">Aderência CSAT</th></tr>
+                                <tr><th class="px-4 md:px-6 py-4">Analista</th><th class="px-4 py-4 text-center">Resolvidos</th><th class="px-4 py-4 text-center">Passivo Resolvido</th><th class="px-4 py-4 text-center">Backlog Retido</th><th class="px-4 py-4 text-center">Aging Médio</th><th class="px-4 py-4 text-center">SLA Média</th><th class="px-4 py-4 text-center">SLA Violado</th><th class="px-4 py-4 text-center">FCR</th><th class="px-4 py-4 text-center">MTTR Médio</th><th class="px-4 py-4 text-center">CSAT</th><th class="px-4 py-4 text-center">Aderência CSAT</th></tr>
                             </thead>
                             <tbody id="table-comparativo-equipe" class="divide-y divide-slate-100"></tbody>
                         </table>
@@ -406,6 +406,10 @@
                         <div class="border border-teal-100 p-4 rounded-lg border-l-4 border-l-teal-600">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-check-double text-teal-600"></i> Resolvidos</h3>
                             <p class="text-xs text-slate-500 mb-3">Total de tickets concluídos com sucesso no período. Ignora tickets cancelados.</p>
+                        </div>
+                        <div class="border border-indigo-100 p-4 rounded-lg border-l-4 border-l-indigo-600">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-box-archive text-indigo-600"></i> Passivo Resolvido</h3>
+                            <p class="text-xs text-slate-500 mb-3">Volume de tickets que foram resolvidos no período selecionado, mas que haviam sido abertos em períodos anteriores. Mostra o esforço da equipe em limpar a fila antiga (redução de backlog).</p>
                         </div>
                         <div class="border border-slate-200 p-4 rounded-lg border-l-4 border-l-slate-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-ban text-slate-500"></i> Cancelados</h3>
@@ -679,10 +683,10 @@
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v29') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v31') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v29');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v31');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -712,7 +716,7 @@
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v29', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v31', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
@@ -787,6 +791,7 @@
             const map = {
                 'Volume':       {bg: 'bg-slate-50',   txt: 'text-slate-800',   ic: 'fa-inbox', bd: 'border-slate-200'},
                 'Resolvidos':   {bg: 'bg-teal-50',    txt: 'text-teal-600',    ic: 'fa-check-double', bd: 'border-teal-100'},
+                'Passivo Resolvido': {bg: 'bg-indigo-50',  txt: 'text-indigo-600',  ic: 'fa-box-archive', bd: 'border-indigo-100'},
                 'Cancelados':   {bg: 'bg-slate-100',  txt: 'text-slate-500',   ic: 'fa-ban', bd: 'border-slate-200'},
                 'Backlog':      {bg: 'bg-orange-50',  txt: 'text-orange-600',  ic: 'fa-layer-group', bd: 'border-orange-100'},
                 'Aging':        {bg: 'bg-red-50',     txt: 'text-red-500',     ic: 'fa-calendar-days', bd: 'border-red-100'},
@@ -1212,7 +1217,6 @@
             renderSelect(analistas, 'selectAnalista');
             renderDiaOptions(diasAll, 'compDiaA'); renderDiaOptions(diasAll, 'compDiaB'); renderDiaOptions(diasAll, 'compDiaC');
             
-            // Lógica crescente para default: A é o antigo (1), B é o novo (0). O Gráfico vai exibir da esquerda para direita: 2025 -> 2026
             if(anos.length >= 2) { document.getElementById('compAnoA').value = anos[1]; document.getElementById('compAnoB').value = anos[0]; }
             if(semestres.length >= 2) { document.getElementById('compSemestreA').value = semestres[1]; document.getElementById('compSemestreB').value = semestres[0]; }
             if(meses.length >= 2) { document.getElementById('compMesA').value = meses[1]; document.getElementById('compMesB').value = meses[0]; }
@@ -1235,11 +1239,13 @@
             const ano = document.getElementById('filterAno').value;
             const mes = document.getElementById('filterMes').value;
             
-            let dadosBase = rawData;
-            if (ano !== "ALL") dadosBase = dadosBase.filter(d => d.Ano_Criacao === ano || d.Ano_Resolucao === ano);
-            if (mes !== "ALL") dadosBase = dadosBase.filter(d => d.Mes_Criacao === mes || d.Mes_Resolucao === mes);
-            
-            const dias = [...new Set(dadosBase.map(d => d.Data_Criacao).concat(dadosBase.map(d => d.Data_Resolucao)))].filter(d=>d).sort().reverse();
+            // Corrige o comportamento para exibir apenas dias pertencentes ao ano/mês selecionados
+            let diasAll = [...new Set(rawData.map(d => d.Data_Criacao).concat(rawData.map(d => d.Data_Resolucao)))].filter(d => d);
+
+            if (ano !== "ALL") diasAll = diasAll.filter(d => d.startsWith(ano));
+            if (mes !== "ALL") diasAll = diasAll.filter(d => d.startsWith(mes));
+
+            const dias = diasAll.sort().reverse();
             
             const selDia = document.getElementById('filterDia');
             if(!selDia) return;
@@ -1252,8 +1258,8 @@
             const ontemIso = getLocalIsoDate(dataOntem);
 
             dias.forEach(i => {
-                const [ano, m, dia] = i.split('-');
-                let label = `${dia}/${m}/${ano}`;
+                const [anoStr, mStr, diaStr] = i.split('-');
+                let label = `${diaStr}/${mStr}/${anoStr}`;
                 if (i === hojeIso) label = `Hoje (${label})`;
                 if (i === ontemIso) label = `Ontem (${label})`;
                 selDia.innerHTML += `<option value="${escapeHTML(i)}">${escapeHTML(label)}</option>`;
@@ -1310,6 +1316,9 @@
             const resolvidos = baseResolvidos.length;
             const cancelados = baseRecebidos.filter(d => d.BaseStatus === "Canceled").length;
             
+            const idsRecebidos = new Set(baseRecebidos.map(d => d.ID_Chamado));
+            const passivoResolvido = baseResolvidos.filter(d => !idsRecebidos.has(d.ID_Chamado)).length;
+
             const pendentes = baseRecebidos.filter(d => !d.IsEncerrado);
             const agingMedio = pendentes.length > 0 ? pendentes.reduce((s, d) => s + d.Aging_Dias, 0) / pendentes.length : 0;
             
@@ -1345,7 +1354,7 @@
             const mediaEsperaSeg = nEspera > 0 ? (chatsComEspera.reduce((s, d) => s + d.Chat_Espera_Seg, 0) / nEspera) : null;
 
             return { 
-                recebidos, cancelados, backlog: pendentes.length, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, 
+                recebidos, cancelados, backlog: pendentes.length, passivoResolvido, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, 
                 csat, csatRespondidos, csatBase, csatAderencia,
                 chat: {
                     atendidos: chatsAtendidos,
@@ -1386,6 +1395,7 @@
             document.getElementById('cards-globais').innerHTML = 
                 buildCardUI('Volume', m.recebidos, getCardConfig('Volume')) +
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
+                buildCardUI('Passivo Resolvido', m.passivoResolvido, getCardConfig('Passivo Resolvido')) +
                 buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
                 buildCardUI('Aging Médio', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
@@ -1436,6 +1446,7 @@
             document.getElementById('cards-analista').innerHTML = 
                 buildCardUI('Volume', m.recebidos, getCardConfig('Volume')) +
                 buildCardUI('Resolvidos', m.resolvidos, getCardConfig('Resolvidos')) +
+                buildCardUI('Passivo Resolvido', m.passivoResolvido, getCardConfig('Passivo Resolvido')) +
                 buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
                 buildCardUI('Aging', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
@@ -1570,7 +1581,7 @@
                 let csatAdFormat = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
                 let csatAdSub = csatFailed ? '' : `<br><span class="text-[9px] text-slate-400">${m.csatRespondidos}/${m.csatBase}</span>`;
                 
-                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td><td class="px-4 py-4 text-center font-bold text-amber-600">${csatAdFormat}${csatAdSub}</td></tr>`;
+                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center text-indigo-600 font-bold">${m.passivoResolvido}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td><td class="px-4 py-4 text-center font-bold text-amber-600">${csatAdFormat}${csatAdSub}</td></tr>`;
             }).join('');
 
             const baseOrdenada = [...filteredData].sort((a, b) => {
@@ -1619,6 +1630,7 @@
                 document.getElementById('cards-delta-anual').innerHTML = 
                     buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
                     buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Passivo Resolvido', metB.passivoResolvido, metA.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1628,17 +1640,17 @@
                     buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsAno = [
-                    { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#ef4444' }, 
-                    { label: valB, data: [metB.recebidos, metB.resolvidos, metB.backlog], backgroundColor: '#cbd5e1' }
+                    { label: valA, data: [metA.recebidos, metA.resolvidos, metA.passivoResolvido, metA.backlog], backgroundColor: '#ef4444' }, 
+                    { label: valB, data: [metB.recebidos, metB.resolvidos, metB.passivoResolvido, metB.backlog], backgroundColor: '#cbd5e1' }
                 ];
                 const selC = document.getElementById('compAnoC');
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, null, null, null, null, selC.value);
-                    dsAno.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#3b82f6' });
+                    dsAno.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.passivoResolvido, metC.backlog], backgroundColor: '#3b82f6' });
                 }
 
                 if(charts['cca']) charts['cca'].destroy();
-                charts['cca'] = new Chart(document.getElementById('chartCompAnual'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Backlog Retido'], datasets: dsAno }, options: chartOptionsBar });
+                charts['cca'] = new Chart(document.getElementById('chartCompAnual'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Passivo Resolvido', 'Backlog Retido'], datasets: dsAno }, options: chartOptionsBar });
             }
 
             if(document.getElementById('compSemestreA')) {
@@ -1648,6 +1660,7 @@
                 document.getElementById('cards-delta-semestral').innerHTML = 
                     buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
                     buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Passivo Resolvido', metB.passivoResolvido, metA.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1657,17 +1670,17 @@
                     buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsSemestre = [
-                    { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#f97316' }, 
-                    { label: valB, data: [metB.recebidos, metB.resolvidos, metB.backlog], backgroundColor: '#cbd5e1' }
+                    { label: valA, data: [metA.recebidos, metA.resolvidos, metA.passivoResolvido, metA.backlog], backgroundColor: '#f97316' }, 
+                    { label: valB, data: [metB.recebidos, metB.resolvidos, metB.passivoResolvido, metB.backlog], backgroundColor: '#cbd5e1' }
                 ];
                 const selC = document.getElementById('compSemestreC');
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, null, null, null, selC.value, null);
-                    dsSemestre.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#14b8a6' });
+                    dsSemestre.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.passivoResolvido, metC.backlog], backgroundColor: '#14b8a6' });
                 }
 
                 if(charts['ccsem']) charts['ccsem'].destroy();
-                charts['ccsem'] = new Chart(document.getElementById('chartCompSemestral'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Backlog Retido'], datasets: dsSemestre }, options: chartOptionsBar });
+                charts['ccsem'] = new Chart(document.getElementById('chartCompSemestral'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Passivo Resolvido', 'Backlog Retido'], datasets: dsSemestre }, options: chartOptionsBar });
             }
 
             if(document.getElementById('compMesA')) {
@@ -1677,6 +1690,7 @@
                 document.getElementById('cards-delta-mensal').innerHTML = 
                     buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
                     buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Passivo Resolvido', metB.passivoResolvido, metA.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1686,17 +1700,17 @@
                     buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
                 
                 let dsMes = [
-                    { label: valA, data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#3b82f6' }, 
-                    { label: valB, data: [metB.recebidos, metB.resolvidos, metB.backlog], backgroundColor: '#cbd5e1' }
+                    { label: valA, data: [metA.recebidos, metA.resolvidos, metA.passivoResolvido, metA.backlog], backgroundColor: '#3b82f6' }, 
+                    { label: valB, data: [metB.recebidos, metB.resolvidos, metB.passivoResolvido, metB.backlog], backgroundColor: '#cbd5e1' }
                 ];
                 const selC = document.getElementById('compMesC');
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, selC.value, null, null, null, null);
-                    dsMes.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#10b981' });
+                    dsMes.push({ label: selC.value, data: [metC.recebidos, metC.resolvidos, metC.passivoResolvido, metC.backlog], backgroundColor: '#10b981' });
                 }
 
                 if(charts['ccm']) charts['ccm'].destroy();
-                charts['ccm'] = new Chart(document.getElementById('chartCompMensal'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Backlog Retido'], datasets: dsMes }, options: chartOptionsBar });
+                charts['ccm'] = new Chart(document.getElementById('chartCompMensal'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Passivo Resolvido', 'Backlog Retido'], datasets: dsMes }, options: chartOptionsBar });
             }
             
             if(document.getElementById('compSemA')) {
@@ -1706,6 +1720,7 @@
                 document.getElementById('cards-delta-semanal').innerHTML = 
                     buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
                     buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Passivo Resolvido', metB.passivoResolvido, metA.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1715,17 +1730,17 @@
                     buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
 
                 let dsSemana = [
-                    { label: getLabelGrafico(valA, 'Sem'), data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#8b5cf6' }, 
-                    { label: getLabelGrafico(valB, 'Sem'), data: [metB.recebidos, metB.resolvidos, metB.backlog], backgroundColor: '#cbd5e1' }
+                    { label: getLabelGrafico(valA, 'Sem'), data: [metA.recebidos, metA.resolvidos, metA.passivoResolvido, metA.backlog], backgroundColor: '#8b5cf6' }, 
+                    { label: getLabelGrafico(valB, 'Sem'), data: [metB.recebidos, metB.resolvidos, metB.passivoResolvido, metB.backlog], backgroundColor: '#cbd5e1' }
                 ];
                 const selC = document.getElementById('compSemC');
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, null, null, selC.value, null, null);
-                    dsSemana.push({ label: getLabelGrafico(selC.value, 'Sem'), data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#f59e0b' });
+                    dsSemana.push({ label: getLabelGrafico(selC.value, 'Sem'), data: [metC.recebidos, metC.resolvidos, metC.passivoResolvido, metC.backlog], backgroundColor: '#f59e0b' });
                 }
                 
                 if(charts['ccs']) charts['ccs'].destroy();
-                charts['ccs'] = new Chart(document.getElementById('chartCompSemanal'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Backlog Retido'], datasets: dsSemana }, options: chartOptionsBar });
+                charts['ccs'] = new Chart(document.getElementById('chartCompSemanal'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Passivo Resolvido', 'Backlog Retido'], datasets: dsSemana }, options: chartOptionsBar });
             }
 
             if(document.getElementById('compDiaA')) {
@@ -1735,26 +1750,27 @@
                 document.getElementById('cards-delta-diario').innerHTML = 
                     buildDeltaCard('Volume', metB.recebidos, metA.recebidos, '', getCardConfig('Volume')) + 
                     buildDeltaCard('Resolvidos', metB.resolvidos, metA.resolvidos, '', getCardConfig('Resolvidos')) + 
+                    buildDeltaCard('Passivo Resolvido', metB.passivoResolvido, metA.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Aging', metB.agingMedio, metA.agingMedio, 'd', getCardConfig('Aging')) +
-                    buildDeltaCard('SLA Violado', metB.slaViolados, metA.slaViolados, '', getCardConfig('SLA Violado')) + 
-                    buildDeltaCard('SLA Média', metB.slaRate, metA.slaRate, '%', getCardConfig('SLA Média')) + 
-                    buildDeltaCard('FCR', metB.fcrRate, metA.fcrRate, '%', getCardConfig('FCR')) + 
-                    buildDeltaCard('MTTR', metB.mttr, metA.mttr, 'h', getCardConfig('MTTR')) + 
-                    buildDeltaCard('CSAT', metB.csat, metA.csat, '', getCardConfig('CSAT')) +
-                    buildDeltaCard('Aderência CSAT', metB.csatAderencia, metA.csatAderencia, '%', getCardConfig('Aderência CSAT'));
+                    buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
+                    buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
+                    buildDeltaCard('FCR', metA.fcrRate, metB.fcrRate, '%', getCardConfig('FCR')) + 
+                    buildDeltaCard('MTTR', metA.mttr, metB.mttr, 'h', getCardConfig('MTTR')) + 
+                    buildDeltaCard('CSAT', metA.csat, metB.csat, '', getCardConfig('CSAT')) +
+                    buildDeltaCard('Aderência CSAT', metA.csatAderencia, metB.csatAderencia, '%', getCardConfig('Aderência CSAT'));
 
                 let dsDia = [
-                    { label: getLabelGrafico(valA, 'Dia'), data: [metA.recebidos, metA.resolvidos, metA.backlog], backgroundColor: '#f59e0b' }, 
-                    { label: getLabelGrafico(valB, 'Dia'), data: [metB.recebidos, metB.resolvidos, metB.backlog], backgroundColor: '#cbd5e1' }
+                    { label: getLabelGrafico(valA, 'Dia'), data: [metA.recebidos, metA.resolvidos, metA.passivoResolvido, metA.backlog], backgroundColor: '#f59e0b' }, 
+                    { label: getLabelGrafico(valB, 'Dia'), data: [metB.recebidos, metB.resolvidos, metB.passivoResolvido, metB.backlog], backgroundColor: '#cbd5e1' }
                 ];
                 const selC = document.getElementById('compDiaC');
                 if(!selC.classList.contains('hidden') && selC.value) {
                     const metC = calcMetrics(rawData, null, selC.value, null, null, null);
-                    dsDia.push({ label: getLabelGrafico(selC.value, 'Dia'), data: [metC.recebidos, metC.resolvidos, metC.backlog], backgroundColor: '#6366f1' });
+                    dsDia.push({ label: getLabelGrafico(selC.value, 'Dia'), data: [metC.recebidos, metC.resolvidos, metC.passivoResolvido, metC.backlog], backgroundColor: '#6366f1' });
                 }
                 
                 if(charts['ccd']) charts['ccd'].destroy();
-                charts['ccd'] = new Chart(document.getElementById('chartCompDiario'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Backlog Retido'], datasets: dsDia }, options: chartOptionsBar });
+                charts['ccd'] = new Chart(document.getElementById('chartCompDiario'), { type: 'bar', data: { labels: ['Recebidos', 'Resolvidos', 'Passivo Resolvido', 'Backlog Retido'], datasets: dsDia }, options: chartOptionsBar });
             }
         }
 
