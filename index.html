@@ -292,7 +292,19 @@
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto scrollbar-thin">
                         <table class="w-full text-sm text-left whitespace-nowrap">
                             <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b">
-                                <tr><th class="px-4 md:px-6 py-4">Analista</th><th class="px-4 py-4 text-center">Resolvidos</th><th class="px-4 py-4 text-center">Passivo Resolvido</th><th class="px-4 py-4 text-center">Backlog Retido</th><th class="px-4 py-4 text-center">Aging Médio</th><th class="px-4 py-4 text-center">SLA Média</th><th class="px-4 py-4 text-center">SLA Violado</th><th class="px-4 py-4 text-center">FCR</th><th class="px-4 py-4 text-center">MTTR Médio</th><th class="px-4 py-4 text-center">CSAT</th><th class="px-4 py-4 text-center">Aderência CSAT</th></tr>
+                                <tr>
+                                    <th class="px-4 md:px-6 py-4">Analista</th>
+                                    <th class="px-4 py-4 text-center">Resolvidos</th>
+                                    <th class="px-4 py-4 text-center">Passivo Resolvido</th>
+                                    <th class="px-4 py-4 text-center">Backlog Retido</th>
+                                    <th class="px-4 py-4 text-center">Aging Médio</th>
+                                    <th class="px-4 py-4 text-center">SLA Média (%)</th>
+                                    <th class="px-4 py-4 text-center">SLA Violado</th>
+                                    <th class="px-4 py-4 text-center">FCR (%)</th>
+                                    <th class="px-4 py-4 text-center">MTTR Médio</th>
+                                    <th class="px-4 py-4 text-center">CSAT</th>
+                                    <th class="px-4 py-4 text-center">Aderência CSAT (%)</th>
+                                </tr>
                             </thead>
                             <tbody id="table-comparativo-equipe" class="divide-y divide-slate-100"></tbody>
                         </table>
@@ -318,7 +330,7 @@
                             <button id="btnRemoveDia" onclick="removePeriodo('Dia')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompDiario"></canvas></div>
                 </div>
 
@@ -337,7 +349,7 @@
                             <button id="btnRemoveSem" onclick="removePeriodo('Sem')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemanal"></canvas></div>
                 </div>
 
@@ -356,7 +368,7 @@
                             <button id="btnRemoveMes" onclick="removePeriodo('Mes')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompMensal"></canvas></div>
                 </div>
 
@@ -375,7 +387,7 @@
                             <button id="btnRemoveSemestre" onclick="removePeriodo('Semestre')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemestral"></canvas></div>
                 </div>
 
@@ -394,7 +406,7 @@
                             <button id="btnRemoveAno" onclick="removePeriodo('Ano')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompAnual"></canvas></div>
                 </div>
 
@@ -427,6 +439,10 @@
                         <div class="border border-orange-100 p-4 rounded-lg border-l-4 border-l-orange-500">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group text-orange-500"></i> Backlog Retido</h3>
                             <p class="text-xs text-slate-500 mb-3">Dos tickets que ENTRARAM no período selecionado, mostra quantos ainda estão pendentes (em aberto) aguardando atendimento ou resposta.</p>
+                        </div>
+                        <div class="border border-fuchsia-100 p-4 rounded-lg border-l-4 border-l-fuchsia-500">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-share-nodes text-fuchsia-500"></i> Taxa de Escalonamento</h3>
+                            <p class="text-xs text-slate-500 mb-3">Proporção de tickets pendentes (Backlog) cujo status contém uma das palavras configuradas em STATUS_ESCALONAMENTO (hoje: 'desenvolvimento' e 'comercial'), indicando que estão parados em outro setor.</p>
                         </div>
                         <div class="border border-red-100 p-4 rounded-lg border-l-4 border-l-red-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-calendar-days text-red-400"></i> Aging (Idade do Chamado)</h3>
@@ -548,7 +564,7 @@
                                     <th class="px-4 py-3">Data da Resposta</th>
                                     <th class="px-4 py-3">Nome do Cliente</th>
                                     <th class="px-4 py-3 min-w-[250px]">A Pergunta Feita</th>
-                                    <th class="px-4 py-3 text-center">A Nota Dada (1-5)</th>
+                                    <th class="px-4 py-3 text-center">A Nota Dada</th>
                                     <th class="px-4 py-3 min-w-[300px]">Comentário Escrito</th>
                                 </tr>
                             </thead>
@@ -735,7 +751,29 @@
                     if (diffMins < 5) {
                         MovideskAPI.updateProgress(`Carregando cache super rápida...`);
                         await MovideskAPI.sleep(800); 
-                        rawCsatItems = cacheObj.csat || [];
+                        
+                        let extratedCsats = [];
+                        if (cacheObj.csat && Array.isArray(cacheObj.csat)) {
+                            cacheObj.csat.forEach(surveyEnvelope => {
+                                const tId = surveyEnvelope.ticketId;
+                                const rDate = surveyEnvelope.responseDate;
+                                if (surveyEnvelope.items && Array.isArray(surveyEnvelope.items)) {
+                                    surveyEnvelope.items.forEach(ans => {
+                                        extratedCsats.push({
+                                            ticketId: tId,
+                                            responseDate: rDate,
+                                            questionDescription: ans.questionDescription,
+                                            questionId: ans.questionId,
+                                            questionType: ans.questionType,
+                                            response: ans.response,
+                                            comments: ans.comments
+                                        });
+                                    });
+                                }
+                            });
+                        }
+                        rawCsatItems = extratedCsats;
+                        
                         return processAndFormatData(cacheObj.tickets, cacheObj.csat);
                     }
                 }
@@ -753,7 +791,28 @@
                 await MovideskAPI.sleep(6500);
                 const csatResult = await MovideskAPI.getCSAT(dataSomenteDia);
                 const csat = csatResult.items;
-                rawCsatItems = csat;
+                
+                let extratedCsats = [];
+                if (csat && Array.isArray(csat)) {
+                    csat.forEach(surveyEnvelope => {
+                        const tId = surveyEnvelope.ticketId;
+                        const rDate = surveyEnvelope.responseDate;
+                        if (surveyEnvelope.items && Array.isArray(surveyEnvelope.items)) {
+                            surveyEnvelope.items.forEach(ans => {
+                                extratedCsats.push({
+                                    ticketId: tId,
+                                    responseDate: rDate,
+                                    questionDescription: ans.questionDescription,
+                                    questionId: ans.questionId,
+                                    questionType: ans.questionType,
+                                    response: ans.response,
+                                    comments: ans.comments
+                                });
+                            });
+                        }
+                    });
+                }
+                rawCsatItems = extratedCsats;
 
                 if (csatResult.failed) {
                     document.getElementById('csat-warning').classList.remove('hidden');
@@ -902,32 +961,36 @@
         }
 
         function processAndFormatData(ticketsArray, csatArray) {
-            const notaCsatValida = survey => {
-                const tipo = Number(survey.type);
-                const valorBruto = survey.value ?? survey.response ?? survey.rating;
-                const valor = Number(valorBruto);
-                if (!Number.isFinite(valor)) return null;
-                if (tipo === 1) return valor === 1 ? 5 : (valor === 2 ? 1 : null);
-                if (tipo === 2 && valor >= 1 && valor <= 5) return valor;
-                return null;
-            };
-
             const respostasPorTicket = new Map();
-            (Array.isArray(csatArray) ? csatArray : []).forEach(survey => {
-                if (!survey || survey.ticketId === null || survey.ticketId === undefined) return;
-                const nota = notaCsatValida(survey);
-                if (nota === null) return;
-
-                const ticketId = String(survey.ticketId);
-                const perguntaId = String(survey.questionId ?? `tipo-${survey.type}`);
-                const dataResposta = Date.parse(survey.responseDate || '') || 0;
-                if (!respostasPorTicket.has(ticketId)) respostasPorTicket.set(ticketId, new Map());
-                const respostasPorPergunta = respostasPorTicket.get(ticketId);
-                const anterior = respostasPorPergunta.get(perguntaId);
-                if (!anterior || dataResposta >= anterior.dataResposta) {
-                    respostasPorPergunta.set(perguntaId, { nota, dataResposta });
-                }
-            });
+            
+            if (Array.isArray(csatArray)) {
+                csatArray.forEach(surveyEnvelope => {
+                    const ticketId = String(surveyEnvelope.ticketId);
+                    const dataResposta = Date.parse(surveyEnvelope.responseDate || '') || 0;
+                    
+                    if (surveyEnvelope.items && Array.isArray(surveyEnvelope.items)) {
+                        surveyEnvelope.items.forEach(ans => {
+                            let nota = null;
+                            const tipo = Number(ans.questionType);
+                            const val = Number(ans.response);
+                            if (tipo === 1) {
+                                nota = (val === 1) ? 5 : ((val === 2) ? 1 : null);
+                            } else if (tipo === 2 && val >= 1 && val <= 5) {
+                                nota = val;
+                            }
+                            if (nota !== null) {
+                                const perguntaId = String(ans.questionId || 'Geral');
+                                if (!respostasPorTicket.has(ticketId)) respostasPorTicket.set(ticketId, new Map());
+                                const respostasPorPergunta = respostasPorTicket.get(ticketId);
+                                const anterior = respostasPorPergunta.get(perguntaId);
+                                if (!anterior || dataResposta >= anterior.dataResposta) {
+                                    respostasPorPergunta.set(perguntaId, { nota, dataResposta });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
 
             const notasCsatMapeadas = Object.create(null);
             respostasPorTicket.forEach((respostas, ticketId) => {
@@ -1692,9 +1755,23 @@
                 const cliente = ticketClientMap.get(tId) || "Cliente";
                 const dataResp = item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-';
                 
-                // Mapeamento exato de todas as possíveis variações de propriedades de pergunta e comentário no Movidesk
                 const pergunta = item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`;
-                const notaVal = item.value ?? item.response ?? item.rating ?? '-';
+                
+                const tipo = Number(item.questionType);
+                const val = Number(item.response || item.value || item.rating);
+                let notaTexto = item.response || item.value || item.rating || '-';
+                
+                if (tipo === 1) { 
+                    if (val === 1) notaTexto = "Satisfeito";
+                    else if (val === 2) notaTexto = "Insatisfeito";
+                } else if (tipo === 2) { 
+                    if (val === 5) notaTexto = "5 - Muito Satisfeito";
+                    else if (val === 4) notaTexto = "4 - Satisfeito";
+                    else if (val === 3) notaTexto = "3 - Neutro";
+                    else if (val === 2) notaTexto = "2 - Insatisfeito";
+                    else if (val === 1) notaTexto = "1 - Muito Insatisfeito";
+                }
+
                 const comentario = item.comment || item.comments || item.feedback || item.observation || item.answer || '-';
 
                 return `
@@ -1704,7 +1781,7 @@
                         <td class="px-4 py-3 text-xs font-mono text-slate-500">${dataResp}</td>
                         <td class="px-4 py-3 text-xs font-bold text-slate-700 truncate max-w-[150px]" title="${escapeHTML(cliente)}">${escapeHTML(cliente)}</td>
                         <td class="px-4 py-3 text-xs text-slate-600 truncate max-w-[300px]" title="${escapeHTML(pergunta)}">${escapeHTML(pergunta)}</td>
-                        <td class="px-4 py-3 text-center font-black text-yellow-600 text-sm">${escapeHTML(notaVal)}</td>
+                        <td class="px-4 py-3 text-center font-black text-yellow-600 text-sm">${escapeHTML(notaTexto)}</td>
                         <td class="px-4 py-3 text-xs text-slate-500 truncate max-w-[350px]" title="${escapeHTML(comentario)}">${escapeHTML(comentario)}</td>
                     </tr>
                 `;
@@ -1884,14 +1961,34 @@
                     const tId = String(item.ticketId);
                     const ticketOwnerMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Analista]));
                     const ticketClientMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Nome_Cliente]));
+                    
+                    const pergunta = item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`;
+                    
+                    const tipo = Number(item.questionType);
+                    const val = Number(item.response || item.value || item.rating);
+                    let notaTexto = item.response || item.value || item.rating || '-';
+                    
+                    if (tipo === 1) { 
+                        if (val === 1) notaTexto = "Satisfeito";
+                        else if (val === 2) notaTexto = "Insatisfeito";
+                    } else if (tipo === 2) { 
+                        if (val === 5) notaTexto = "5 - Muito Satisfeito";
+                        else if (val === 4) notaTexto = "4 - Satisfeito";
+                        else if (val === 3) notaTexto = "3 - Neutro";
+                        else if (val === 2) notaTexto = "2 - Insatisfeito";
+                        else if (val === 1) notaTexto = "1 - Muito Insatisfeito";
+                    }
+
+                    const comentario = item.comment || item.comments || item.feedback || item.observation || item.answer || '-';
+
                     return {
                         "ID do Chamado": `#${tId}`,
                         "Nome do Analista": ticketOwnerMap.get(tId) || "Não Atribuído",
                         "Data da Resposta": item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-',
                         "Nome do Cliente": ticketClientMap.get(tId) || "Cliente",
-                        "A Pergunta Feita": item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`,
-                        "A Nota Dada (1-5)": item.value ?? item.response ?? item.rating ?? '-',
-                        "Comentário Escrito": item.comment || item.comments || item.feedback || item.observation || item.answer || '-'
+                        "A Pergunta Feita": pergunta,
+                        "A Nota Dada": notaTexto,
+                        "Comentário Escrito": comentario
                     };
                 });
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dadosCsatExport), "Auditoria_CSAT");
