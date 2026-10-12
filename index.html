@@ -748,10 +748,10 @@
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v41') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v42') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v41');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v42');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -759,29 +759,7 @@
                     if (diffMins < 5) {
                         MovideskAPI.updateProgress(`Carregando cache super rápida...`);
                         await MovideskAPI.sleep(800); 
-                        
-                        let extratedCsats = [];
-                        if (cacheObj.csat && Array.isArray(cacheObj.csat)) {
-                            cacheObj.csat.forEach(surveyEnvelope => {
-                                const tId = surveyEnvelope.ticketId;
-                                const rDate = surveyEnvelope.responseDate;
-                                if (surveyEnvelope.items && Array.isArray(surveyEnvelope.items)) {
-                                    surveyEnvelope.items.forEach(ans => {
-                                        extratedCsats.push({
-                                            ticketId: tId,
-                                            responseDate: rDate,
-                                            questionDescription: ans.questionDescription,
-                                            questionId: ans.questionId,
-                                            questionType: ans.questionType,
-                                            response: ans.response,
-                                            comments: ans.comments || ans.comment || ans.justification || ans.feedback || ans.observation || ans.text
-                                        });
-                                    });
-                                }
-                            });
-                        }
-                        rawCsatItems = extratedCsats;
-                        
+                        rawCsatItems = cacheObj.csat || [];
                         return processAndFormatData(cacheObj.tickets, cacheObj.csat);
                     }
                 }
@@ -799,34 +777,13 @@
                 await MovideskAPI.sleep(6500);
                 const csatResult = await MovideskAPI.getCSAT(dataSomenteDia);
                 const csat = csatResult.items;
-                
-                let extratedCsats = [];
-                if (csat && Array.isArray(csat)) {
-                    csat.forEach(surveyEnvelope => {
-                        const tId = surveyEnvelope.ticketId;
-                        const rDate = surveyEnvelope.responseDate;
-                        if (surveyEnvelope.items && Array.isArray(surveyEnvelope.items)) {
-                            surveyEnvelope.items.forEach(ans => {
-                                extratedCsats.push({
-                                    ticketId: tId,
-                                    responseDate: rDate,
-                                    questionDescription: ans.questionDescription,
-                                    questionId: ans.questionId,
-                                    questionType: ans.questionType,
-                                    response: ans.response,
-                                    comments: ans.comments || ans.comment || ans.justification || ans.feedback || ans.observation || ans.text
-                                });
-                            });
-                        }
-                    });
-                }
-                rawCsatItems = extratedCsats;
+                rawCsatItems = csat;
 
                 if (csatResult.failed) {
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v41', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v42', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
@@ -1760,27 +1717,37 @@
                 const cliente = ticketClientMap.get(tId) || "Cliente";
                 const dataResp = item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-';
                 
-                let pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
+                const pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
                 
-                const tipo = Number(item.questionType);
-                const val = Number(item.response || item.value || item.rating);
-                let notaTexto = item.response || item.value || item.rating || '-';
-                let comentario = item.comments || '-';
+                const tipo = Number(item.type || item.questionType);
+                const valorReal = item.response ?? item.value ?? item.rating;
+                const valNum = Number(valorReal);
                 
-                if (tipo === 3 || tipo === 4 || isNaN(val)) {
-                    if (comentario === '-' && notaTexto !== '-') {
-                        comentario = notaTexto;
-                        notaTexto = '-';
+                let notaTexto = '-';
+                let comentario = item.comments || item.comment || item.justification || item.feedback || item.observation || '-';
+
+                if (isNaN(valNum) && valorReal && typeof valorReal === 'string') {
+                    if (comentario === '-' || comentario === valorReal) {
+                        comentario = valorReal;
+                    } else {
+                        comentario = valorReal + " | " + comentario;
                     }
-                } else if (tipo === 1) { 
-                    if (val === 1) notaTexto = "5 - Satisfeito";
-                    else if (val === 2) notaTexto = "1 - Insatisfeito";
-                } else if (tipo === 2) { 
-                    if (val === 5) notaTexto = "5 - Muito Satisfeito";
-                    else if (val === 4) notaTexto = "4 - Satisfeito";
-                    else if (val === 3) notaTexto = "3 - Neutro";
-                    else if (val === 2) notaTexto = "2 - Insatisfeito";
-                    else if (val === 1) notaTexto = "1 - Muito Insatisfeito";
+                    notaTexto = '-';
+                } else {
+                    if (tipo === 1) { 
+                        if (valNum === 1) notaTexto = "5 - Satisfeito";
+                        else if (valNum === 2) notaTexto = "1 - Insatisfeito";
+                        else notaTexto = String(valorReal);
+                    } else if (tipo === 2 || (!isNaN(valNum) && valNum >= 1 && valNum <= 5)) { 
+                        if (valNum === 5) notaTexto = "5 - Muito Satisfeito";
+                        else if (valNum === 4) notaTexto = "4 - Satisfeito";
+                        else if (valNum === 3) notaTexto = "3 - Neutro";
+                        else if (valNum === 2) notaTexto = "2 - Insatisfeito";
+                        else if (valNum === 1) notaTexto = "1 - Muito Insatisfeito";
+                        else notaTexto = String(valorReal);
+                    } else {
+                        notaTexto = valorReal !== undefined && valorReal !== null ? String(valorReal) : '-';
+                    }
                 }
 
                 return `
@@ -1971,27 +1938,37 @@
                     const ticketOwnerMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Analista]));
                     const ticketClientMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Nome_Cliente]));
                     
-                    let pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`;
+                    const pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
                     
-                    const tipo = Number(item.questionType);
-                    const val = Number(item.response || item.value || item.rating);
-                    let notaTexto = item.response || item.value || item.rating || '-';
-                    let comentario = item.comments || '-';
+                    const tipo = Number(item.type || item.questionType);
+                    const valorReal = item.response ?? item.value ?? item.rating;
+                    const valNum = Number(valorReal);
                     
-                    if (tipo === 3 || tipo === 4 || isNaN(val)) {
-                        if (comentario === '-' && notaTexto !== '-') {
-                            comentario = notaTexto;
-                            notaTexto = '-';
+                    let notaTexto = '-';
+                    let comentario = item.comments || item.comment || item.justification || item.feedback || item.observation || '-';
+
+                    if (isNaN(valNum) && valorReal && typeof valorReal === 'string') {
+                        if (comentario === '-' || comentario === valorReal) {
+                            comentario = valorReal;
+                        } else {
+                            comentario = valorReal + " | " + comentario;
                         }
-                    } else if (tipo === 1) { 
-                        if (val === 1) notaTexto = "5 - Satisfeito";
-                        else if (val === 2) notaTexto = "1 - Insatisfeito";
-                    } else if (tipo === 2) { 
-                        if (val === 5) notaTexto = "5 - Muito Satisfeito";
-                        else if (val === 4) notaTexto = "4 - Satisfeito";
-                        else if (val === 3) notaTexto = "3 - Neutro";
-                        else if (val === 2) notaTexto = "2 - Insatisfeito";
-                        else if (val === 1) notaTexto = "1 - Muito Insatisfeito";
+                        notaTexto = '-';
+                    } else {
+                        if (tipo === 1) { 
+                            if (valNum === 1) notaTexto = "5 - Satisfeito";
+                            else if (valNum === 2) notaTexto = "1 - Insatisfeito";
+                            else notaTexto = String(valorReal);
+                        } else if (tipo === 2 || (!isNaN(valNum) && valNum >= 1 && valNum <= 5)) { 
+                            if (valNum === 5) notaTexto = "5 - Muito Satisfeito";
+                            else if (valNum === 4) notaTexto = "4 - Satisfeito";
+                            else if (valNum === 3) notaTexto = "3 - Neutro";
+                            else if (valNum === 2) notaTexto = "2 - Insatisfeito";
+                            else if (valNum === 1) notaTexto = "1 - Muito Insatisfeito";
+                            else notaTexto = String(valorReal);
+                        } else {
+                            notaTexto = valorReal !== undefined && valorReal !== null ? String(valorReal) : '-';
+                        }
                     }
 
                     return {
