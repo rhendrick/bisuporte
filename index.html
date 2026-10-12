@@ -449,11 +449,11 @@
                         </div>
                         <div class="border border-yellow-100 p-4 rounded-lg border-l-4 border-l-yellow-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-star text-yellow-400"></i> CSAT</h3>
-                            <p class="text-xs text-slate-500 mb-3">Índice médio de Satisfação do Cliente, gerado pelas respostas das pesquisas pós-atendimento.</p>
+                            <p class="text-xs text-slate-500 mb-3">Média das avaliações válidas por chamado, em escala de 1 a 5. Se um chamado tiver várias perguntas de CSAT, cada pergunta válida é considerada uma vez e as notas são primeiro agrupadas por chamado. Na pesquisa binária de satisfação, Satisfeito vale 5 e Insatisfeito vale 1. Pesquisas NPS e Sim/Não não entram nesta nota porque usam escalas diferentes.</p>
                         </div>
                         <div class="border border-amber-100 p-4 rounded-lg border-l-4 border-l-amber-500">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-amber-500"></i> Aderência CSAT</h3>
-                            <p class="text-xs text-slate-500 mb-3">Percentual de tickets resolvidos no período que receberam avaliação do cliente, exibido também como 'x de y resolvidos'. Mede o engajamento e a validade estatística da nota CSAT.</p>
+                            <p class="text-xs text-slate-500 mb-3">Percentual de chamados resolvidos que receberam ao menos uma resposta válida de CSAT (pesquisas de satisfação 1/2 ou carinhas 1–5), exibido como 'x de y resolvidos'. Cada chamado conta uma vez, mesmo que tenha várias perguntas respondidas.</p>
                         </div>
                     </div>
 
@@ -867,9 +867,43 @@
         }
 
         function processAndFormatData(ticketsArray, csatArray) {
-            let notasCsatMapeadas = {};
-            csatArray.forEach(survey => {
-                if(survey.ticketId) notasCsatMapeadas[survey.ticketId] = parseFloat(survey.value) || parseFloat(survey.response) || parseFloat(survey.rating) || 0;
+            // Converte apenas escalas de satisfação compatíveis para uma escala de 1 a 5.
+            // Tipo 1: 1 = satisfeito, 2 = insatisfeito. Tipo 2: carinhas de 1 a 5.
+            // NPS (tipo 3) e Sim/Não (tipo 4) não são CSAT e ficam fora da média.
+            const notaCsatValida = survey => {
+                const tipo = Number(survey.type);
+                const valorBruto = survey.value ?? survey.response ?? survey.rating;
+                const valor = Number(valorBruto);
+                if (!Number.isFinite(valor)) return null;
+                if (tipo === 1) return valor === 1 ? 5 : (valor === 2 ? 1 : null);
+                if (tipo === 2 && valor >= 1 && valor <= 5) return valor;
+                return null;
+            };
+
+            // Uma resposta por pergunta e chamado: se houver duplicata, mantém a mais recente.
+            const respostasPorTicket = new Map();
+            (Array.isArray(csatArray) ? csatArray : []).forEach(survey => {
+                if (!survey || survey.ticketId === null || survey.ticketId === undefined) return;
+                const nota = notaCsatValida(survey);
+                if (nota === null) return;
+
+                const ticketId = String(survey.ticketId);
+                const perguntaId = String(survey.questionId ?? `tipo-${survey.type}`);
+                const dataResposta = Date.parse(survey.responseDate || '') || 0;
+                if (!respostasPorTicket.has(ticketId)) respostasPorTicket.set(ticketId, new Map());
+                const respostasPorPergunta = respostasPorTicket.get(ticketId);
+                const anterior = respostasPorPergunta.get(perguntaId);
+                if (!anterior || dataResposta >= anterior.dataResposta) {
+                    respostasPorPergunta.set(perguntaId, { nota, dataResposta });
+                }
+            });
+
+            // Primeiro calcula a média das perguntas válidas de cada chamado.
+            // Assim, um chamado com mais perguntas não ganha peso extra na média geral.
+            const notasCsatMapeadas = Object.create(null);
+            respostasPorTicket.forEach((respostas, ticketId) => {
+                const notas = [...respostas.values()].map(resposta => resposta.nota);
+                if (notas.length) notasCsatMapeadas[ticketId] = notas.reduce((soma, nota) => soma + nota, 0) / notas.length;
             });
 
             const originMap = {
