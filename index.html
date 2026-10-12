@@ -42,15 +42,39 @@
         /* MODO RELATÓRIO (IMPRESSÃO PDF / CANVAS) */
         @media print {
             @page { margin: 1cm; size: landscape; }
-            body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body, html { height: auto !important; overflow: visible !important; background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #sidebar, .mobile-overlay, #loader, .print-hide { display: none !important; }
-            main { margin: 0 !important; padding: 0 !important; overflow: visible !important; height: auto !important; width: 100% !important; background: #fff !important; }
+            main { height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: transparent !important; display: block !important; }
+            #area-conteudo-export { height: auto !important; overflow: visible !important; padding: 0 !important; }
+            
             .tab-content { display: none !important; }
-            .tab-content.active { display: block !important; page-break-inside: avoid; }
-            .table-container { max-height: none !important; overflow: visible !important; }
-            .bg-slate-50 { background: #fff !important; }
+            .tab-content.active { display: block !important; }
+            
+            /* Expansão e Quebra Correta de Tabelas */
+            .table-container, .overflow-x-auto, .overflow-y-auto, .overflow-auto { max-height: none !important; overflow: visible !important; display: block !important; }
+            table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; }
+            thead { display: table-header-group !important; }
+            tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+            th, td { white-space: normal !important; word-wrap: break-word !important; }
+            .whitespace-nowrap { white-space: normal !important; word-wrap: break-word !important; }
+            
+            /* Componentes individuais (Cards/Gráficos) */
+            .print-break-inside { page-break-inside: avoid !important; break-inside: avoid !important; }
+            
             #print-header { display: block !important; }
             header { display: none !important; }
+        }
+
+        /* CLASSE TEMPORÁRIA PARA O BOTÃO "PARTILHAR" (HTML2CANVAS) SEGUIR O MESMO COMPORTAMENTO DE EXPANSÃO DO PDF */
+        .export-mode-active, .export-mode-active body, .export-mode-active main, .export-mode-active #area-conteudo-export {
+            height: auto !important; overflow: visible !important;
+        }
+        .export-mode-active .table-container, .export-mode-active .overflow-x-auto, .export-mode-active .overflow-y-auto, .export-mode-active .overflow-auto {
+            max-height: none !important; overflow: visible !important; display: block !important;
+        }
+        .export-mode-active table { width: 100% !important; table-layout: auto !important; }
+        .export-mode-active .whitespace-nowrap, .export-mode-active th, .export-mode-active td { 
+            white-space: normal !important; word-wrap: break-word !important; 
         }
     </style>
 </head>
@@ -99,9 +123,9 @@
             <button class="tab-btn active text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-geral', this)"><i class="fa-solid fa-chart-pie w-4"></i> Executivo Global</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-analista-diario', this)"><i class="fa-solid fa-user-check w-4"></i> Meu Painel (Diário)</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-comparativo', this)"><i class="fa-solid fa-scale-balanced w-4"></i> Comparativos</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('auditoria-csat', this)"><i class="fa-solid fa-star w-4"></i> Auditoria CSAT</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-legendas', this)"><i class="fa-solid fa-book-open w-4"></i> Dicionário de Métricas</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('base-dados', this)"><i class="fa-solid fa-database w-4"></i> Base de Chamados</button>
-            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('auditoria-csat', this)"><i class="fa-solid fa-star w-4"></i> Auditoria CSAT</button>
         </div>
     </aside>
 
@@ -109,18 +133,25 @@
         <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex justify-between items-center shrink-0 shadow-sm z-10 w-full print-hide">
             <div class="flex items-center gap-4">
                 <button class="md:hidden text-slate-600 text-xl print-hide" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-                <h2 class="text-lg md:text-xl font-bold text-slate-800 truncate" id="header-title">Visão Geral & KPIs</h2>
+                <div class="flex flex-col">
+                    <h2 class="text-lg md:text-xl font-bold text-slate-800 truncate" id="header-title">Visão Geral & KPIs</h2>
+                    <!-- Reservado para data/hora da última atualização futura -->
+                    <p id="header-subtitle" class="text-[10px] text-slate-400 hidden"></p>
+                </div>
             </div>
             
             <div class="flex items-center gap-2 print-hide">
+                <button id="btnAtualizar" onclick="atualizarDados()" class="bg-indigo-600 hover:bg-indigo-700 text-white w-9 h-9 md:w-auto md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-bold transition shadow-sm flex items-center justify-center gap-2" title="Forçar atualização da API">
+                    <i id="iconAtualizar" class="fa-solid fa-rotate-right"></i> <span class="hidden md:inline">Atualizar</span>
+                </button>
+                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white w-9 h-9 md:w-auto md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-bold transition shadow-sm flex items-center justify-center gap-2" title="Exportar Dados em Planilha">
+                    <i class="fa-solid fa-file-excel"></i> <span class="hidden md:inline">Excel</span>
+                </button>
                 <button onclick="imprimirPDF()" class="bg-slate-600 hover:bg-slate-700 text-white w-9 h-9 md:w-auto md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-bold transition shadow-sm flex items-center justify-center gap-2" title="Imprimir Relatório em PDF">
                     <i class="fa-solid fa-print"></i> <span class="hidden md:inline">PDF</span>
                 </button>
                 <button onclick="compartilharPainel()" class="bg-blue-600 hover:bg-blue-700 text-white w-9 h-9 md:w-auto md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-bold transition shadow-sm flex items-center justify-center gap-2" title="Partilhar Imagem do Painel">
                     <i class="fa-solid fa-share-nodes"></i> <span class="hidden md:inline">Partilhar</span>
-                </button>
-                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white w-9 h-9 md:w-auto md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-bold transition shadow-sm flex items-center justify-center gap-2" title="Exportar Dados em Planilha">
-                    <i class="fa-solid fa-file-excel"></i> <span class="hidden md:inline">Excel</span>
                 </button>
             </div>
         </header>
@@ -411,8 +442,34 @@
                 </div>
 
             </div>
+            
+            <!-- TAB 4: AUDITORIA CSAT -->
+            <div id="auditoria-csat" class="tab-content w-full">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px] md:h-[600px] w-full print-break-inside">
+                    <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50">
+                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-star text-yellow-500 mr-2"></i> Auditoria de Respostas CSAT (Pergunta a Pergunta)</h3>
+                        <span id="contador-csat" class="bg-yellow-100 text-yellow-800 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider self-start md:self-auto">0 avaliações</span>
+                    </div>
+                    <div class="flex-1 overflow-auto scrollbar-thin">
+                        <table class="w-full text-sm text-left whitespace-nowrap">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-4 py-3">ID do Chamado</th>
+                                    <th class="px-4 py-3">Nome do Analista</th>
+                                    <th class="px-4 py-3">Data da Resposta</th>
+                                    <th class="px-4 py-3">Nome do Cliente</th>
+                                    <th class="px-4 py-3 min-w-[250px]">A Pergunta Feita</th>
+                                    <th class="px-4 py-3 text-center">A Nota Dada</th>
+                                    <th class="px-4 py-3 min-w-[300px]">Comentário Escrito</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-csat-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-            <!-- TAB 4: LEGENDA DE MÉTRICAS -->
+            <!-- TAB 5: LEGENDA DE MÉTRICAS -->
             <div id="visao-legendas" class="tab-content w-full">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-8 print-break-inside">
                     <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-2 border-b border-slate-100 pb-4">Dicionário de Indicadores</h2>
@@ -508,7 +565,7 @@
                 </div>
             </div>
 
-            <!-- TAB 5: BASE DE DADOS (CHAMADOS) -->
+            <!-- TAB 6: BASE DE DADOS (CHAMADOS) -->
             <div id="base-dados" class="tab-content w-full">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px] md:h-[600px] w-full print-break-inside">
                     <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50">
@@ -548,32 +605,6 @@
                 </div>
             </div>
 
-            <!-- TAB 6: AUDITORIA CSAT -->
-            <div id="auditoria-csat" class="tab-content w-full">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px] md:h-[600px] w-full print-break-inside">
-                    <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50">
-                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-star text-yellow-500 mr-2"></i> Auditoria de Respostas CSAT (Pergunta a Pergunta)</h3>
-                        <span id="contador-csat" class="bg-yellow-100 text-yellow-800 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider self-start md:self-auto">0 avaliações</span>
-                    </div>
-                    <div class="flex-1 overflow-auto scrollbar-thin">
-                        <table class="w-full text-sm text-left whitespace-nowrap">
-                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b sticky top-0 z-10">
-                                <tr>
-                                    <th class="px-4 py-3">ID do Chamado</th>
-                                    <th class="px-4 py-3">Nome do Analista</th>
-                                    <th class="px-4 py-3">Data da Resposta</th>
-                                    <th class="px-4 py-3">Nome do Cliente</th>
-                                    <th class="px-4 py-3 min-w-[250px]">A Pergunta Feita</th>
-                                    <th class="px-4 py-3 text-center">A Nota Dada</th>
-                                    <th class="px-4 py-3 min-w-[300px]">Comentário Escrito</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-csat-body" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </main>
 
@@ -586,7 +617,6 @@
         const STATUS_ESCALONAMENTO = ['desenvolvimento', 'comercial'];
 
         // DICIONÁRIO DE PERGUNTAS CSAT
-        // Substitua os textos abaixo pelas frases exatas que você configurou no Movidesk
         const DICIONARIO_PERGUNTAS = {
             "Z94k": "Avaliação do Atendimento",
             "94xd": "Avaliação do Tempo de Solução",
@@ -741,26 +771,50 @@
             }
         };
 
-        async function fetchMovideskDataWithCache() {
+        async function fetchMovideskDataWithCache(forceRefresh = false) {
             if(!MOVIDESK_TOKEN || MOVIDESK_TOKEN === "COLE_SUA_CHAVE_AQUI") {
                 alert("Token do Movidesk não configurado.");
                 return [];
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v42') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v43') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v42');
-                if (cacheStr) {
-                    const cacheObj = JSON.parse(cacheStr);
-                    const now = Date.now();
-                    const diffMins = (now - cacheObj.timestamp) / (1000 * 60);
-                    if (diffMins < 5) {
-                        MovideskAPI.updateProgress(`Carregando cache super rápida...`);
-                        await MovideskAPI.sleep(800); 
-                        rawCsatItems = cacheObj.csat || [];
-                        return processAndFormatData(cacheObj.tickets, cacheObj.csat);
+                if (!forceRefresh) {
+                    const cacheStr = localStorage.getItem('movidesk_bi_cache_v43');
+                    if (cacheStr) {
+                        const cacheObj = JSON.parse(cacheStr);
+                        const now = Date.now();
+                        const diffMins = (now - cacheObj.timestamp) / (1000 * 60);
+                        if (diffMins < 5) {
+                            MovideskAPI.updateProgress(`Carregando cache super rápida...`);
+                            await MovideskAPI.sleep(800); 
+                            
+                            let extratedCsats = [];
+                            if (cacheObj.csat && Array.isArray(cacheObj.csat)) {
+                                cacheObj.csat.forEach(surveyEnvelope => {
+                                    const tId = surveyEnvelope.ticketId;
+                                    const rDate = surveyEnvelope.responseDate;
+                                    if (surveyEnvelope.items && Array.isArray(surveyEnvelope.items)) {
+                                        surveyEnvelope.items.forEach(ans => {
+                                            extratedCsats.push({
+                                                ticketId: tId,
+                                                responseDate: rDate,
+                                                questionDescription: ans.questionDescription,
+                                                questionId: ans.questionId,
+                                                questionType: ans.questionType,
+                                                response: ans.response,
+                                                commentary: ans.commentary
+                                            });
+                                        });
+                                    }
+                                });
+                            }
+                            rawCsatItems = extratedCsats;
+                            
+                            return processAndFormatData(cacheObj.tickets, cacheObj.csat);
+                        }
                     }
                 }
             } catch(e) {}
@@ -777,21 +831,84 @@
                 await MovideskAPI.sleep(6500);
                 const csatResult = await MovideskAPI.getCSAT(dataSomenteDia);
                 const csat = csatResult.items;
-                rawCsatItems = csat;
+                
+                let extratedCsats = [];
+                if (csat && Array.isArray(csat)) {
+                    csat.forEach(surveyEnvelope => {
+                        const tId = surveyEnvelope.ticketId;
+                        const rDate = surveyEnvelope.responseDate;
+                        if (surveyEnvelope.items && Array.isArray(surveyEnvelope.items)) {
+                            surveyEnvelope.items.forEach(ans => {
+                                extratedCsats.push({
+                                    ticketId: tId,
+                                    responseDate: rDate,
+                                    questionDescription: ans.questionDescription,
+                                    questionId: ans.questionId,
+                                    questionType: ans.questionType,
+                                    response: ans.response,
+                                    commentary: ans.commentary
+                                });
+                            });
+                        }
+                    });
+                }
+                rawCsatItems = extratedCsats;
 
                 if (csatResult.failed) {
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v42', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v43', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
                 }
                 return processAndFormatData(tickets, csat);
             } catch (err) {
-                alert(`Erro de Ligação:\n${err.message}`);
-                return [];
+                if (!forceRefresh) alert(`Erro de Ligação:\n${err.message}`);
+                throw err; 
+            }
+        }
+
+        async function atualizarDados() {
+            const btn = document.getElementById('btnAtualizar');
+            const icone = document.getElementById('iconAtualizar');
+            
+            if (btn.disabled) return;
+            btn.disabled = true;
+            icone.classList.add('fa-spin');
+            
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            MovideskAPI.updateProgress('Forçando atualização com a API...');
+            
+            try {
+                const cAno = document.getElementById('filterAno').value;
+                const cMes = document.getElementById('filterMes').value;
+                const cDia = document.getElementById('filterDia').value;
+                const cAna = document.getElementById('selectAnalista').value;
+
+                const newData = await fetchMovideskDataWithCache(true);
+                
+                if (newData && newData.length > 0) {
+                    rawData = newData;
+                    populateFilters();
+                    
+                    if (document.querySelector(`#filterAno option[value="${cAno}"]`)) document.getElementById('filterAno').value = cAno;
+                    onAnoChange(); 
+                    if (document.querySelector(`#filterMes option[value="${cMes}"]`)) document.getElementById('filterMes').value = cMes;
+                    updateDiaDropdown();
+                    if (document.querySelector(`#filterDia option[value="${cDia}"]`)) document.getElementById('filterDia').value = cDia;
+                    if (document.querySelector(`#selectAnalista option[value="${cAna}"]`)) document.getElementById('selectAnalista').value = cAna;
+
+                    applyFilters();
+                }
+            } catch (err) {
+                alert('A atualização falhou. Os dados anteriores foram mantidos na tela.\nDetalhes: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                icone.classList.remove('fa-spin');
+                loader.style.display = 'none';
             }
         }
 
@@ -1108,15 +1225,20 @@
             const printHeader = document.getElementById('print-header');
             const targetArea = document.getElementById('area-conteudo-export');
             
-            targetArea.classList.remove('overflow-y-auto');
-            targetArea.style.overflow = 'hidden';
+            // Simula a expansão do PDF para o Canvas capturar tudo sem cortar
+            document.documentElement.classList.add('export-mode-active');
             printHeader.classList.remove('hidden');
 
             try {
-                const canvas = await html2canvas(targetArea, { scale: 2, useCORS: true, backgroundColor: '#f8fafc' });
+                const canvas = await html2canvas(targetArea, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: '#f8fafc',
+                    windowHeight: targetArea.scrollHeight + 150 
+                });
+                
                 printHeader.classList.add('hidden');
-                targetArea.classList.add('overflow-y-auto');
-                targetArea.style.overflow = '';
+                document.documentElement.classList.remove('export-mode-active');
 
                 canvas.toBlob(async (blob) => {
                     const dataAtual = new Date().toISOString().split('T')[0];
@@ -1133,7 +1255,7 @@
                 }, 'image/png');
             } catch (err) {
                 printHeader.classList.add('hidden');
-                targetArea.classList.add('overflow-y-auto');
+                document.documentElement.classList.remove('export-mode-active');
                 alert("Erro ao tentar processar a imagem do painel.");
             }
         }
@@ -1930,27 +2052,29 @@
                     const ticketOwnerMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Analista]));
                     const ticketClientMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Nome_Cliente]));
                     
-                    let pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || `Pergunta #${item.questionId || 'Geral'}`;
+                    const pergunta = DICIONARIO_PERGUNTAS[item.questionId] || item.questionDescription || item.question || item.description || item.title || item.questionTitle || item.text || `Pergunta #${item.questionId || 'Geral'}`;
                     
                     const tipo = Number(item.type || item.questionType);
-                    const val = Number(item.response || item.value || item.rating);
-                    let notaTexto = item.response || item.value || item.rating || '-';
+                    const valorReal = item.response ?? item.value ?? item.rating;
+                    const valNum = Number(valorReal);
+                    
+                    let notaTexto = '-';
                     let comentario = item.commentary || item.comments || item.comment || item.justification || item.feedback || item.observation || '-';
                     
-                    if (tipo === 3 || tipo === 4 || isNaN(val)) {
+                    if (tipo === 3 || tipo === 4 || isNaN(valNum)) {
                         if (comentario === '-' && notaTexto !== '-') {
                             comentario = notaTexto;
                             notaTexto = '-';
                         }
                     } else if (tipo === 1) { 
-                        if (val === 1) notaTexto = "5 - Satisfeito";
-                        else if (val === 2) notaTexto = "1 - Insatisfeito";
+                        if (valNum === 1) notaTexto = "5 - Satisfeito";
+                        else if (valNum === 2) notaTexto = "1 - Insatisfeito";
                     } else if (tipo === 2) { 
-                        if (val === 5) notaTexto = "5 - Muito Satisfeito";
-                        else if (val === 4) notaTexto = "4 - Satisfeito";
-                        else if (val === 3) notaTexto = "3 - Neutro";
-                        else if (val === 2) notaTexto = "2 - Insatisfeito";
-                        else if (val === 1) notaTexto = "1 - Muito Insatisfeito";
+                        if (valNum === 5) notaTexto = "5 - Muito Satisfeito";
+                        else if (valNum === 4) notaTexto = "4 - Satisfeito";
+                        else if (valNum === 3) notaTexto = "3 - Neutro";
+                        else if (valNum === 2) notaTexto = "2 - Insatisfeito";
+                        else if (valNum === 1) notaTexto = "1 - Muito Insatisfeito";
                     }
 
                     return {
