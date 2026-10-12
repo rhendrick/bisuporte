@@ -150,7 +150,7 @@
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-blue-600 text-base"></i> Indicadores Principais (Global)
                     </h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4" id="cards-globais"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4" id="cards-globais"></div>
                 </div>
 
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
@@ -233,7 +233,7 @@
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-blue-600 text-base"></i> Indicadores Principais (Individual)
                     </h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4" id="cards-analista"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4" id="cards-analista"></div>
                 </div>
 
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
@@ -291,7 +291,21 @@
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto scrollbar-thin">
                         <table class="w-full text-sm text-left whitespace-nowrap">
                             <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b">
-                                <tr><th class="px-4 md:px-6 py-4">Analista</th><th class="px-4 py-4 text-center">Resolvidos</th><th class="px-4 py-4 text-center">Passivo Resolvido</th><th class="px-4 py-4 text-center">Backlog Retido</th><th class="px-4 py-4 text-center">Aging Médio</th><th class="px-4 py-4 text-center">SLA Média</th><th class="px-4 py-4 text-center">SLA Violado</th><th class="px-4 py-4 text-center">FCR</th><th class="px-4 py-4 text-center">MTTR Médio</th><th class="px-4 py-4 text-center">CSAT</th><th class="px-4 py-4 text-center">Aderência CSAT</th></tr>
+                                <tr>
+                                    <th class="px-4 md:px-6 py-4">Analista</th>
+                                    <th class="px-4 py-4 text-center">Resolvidos</th>
+                                    <th class="px-4 py-4 text-center">Passivo Resolvido</th>
+                                    <th class="px-4 py-4 text-center">Backlog Retido</th>
+                                    <th class="px-4 py-4 text-center">Aging Médio</th>
+                                    <th class="px-4 py-4 text-center">SLA Média (%)</th>
+                                    <th class="px-4 py-4 text-center">SLA Violado</th>
+                                    <th class="px-4 py-4 text-center">FCR (%)</th>
+                                    <th class="px-4 py-4 text-center">TMA</th>
+                                    <th class="px-4 py-4 text-center">MTTR Médio</th>
+                                    <th class="px-4 py-4 text-center">Escalonamento (%)</th>
+                                    <th class="px-4 py-4 text-center">CSAT</th>
+                                    <th class="px-4 py-4 text-center">Aderência CSAT (%)</th>
+                                </tr>
                             </thead>
                             <tbody id="table-comparativo-equipe" class="divide-y divide-slate-100"></tbody>
                         </table>
@@ -317,7 +331,7 @@
                             <button id="btnRemoveDia" onclick="removePeriodo('Dia')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompDiario"></canvas></div>
                 </div>
 
@@ -336,7 +350,7 @@
                             <button id="btnRemoveSem" onclick="removePeriodo('Sem')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemanal"></canvas></div>
                 </div>
 
@@ -355,7 +369,7 @@
                             <button id="btnRemoveMes" onclick="removePeriodo('Mes')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompMensal"></canvas></div>
                 </div>
 
@@ -374,7 +388,7 @@
                             <button id="btnRemoveSemestre" onclick="removePeriodo('Semestre')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemestral"></canvas></div>
                 </div>
 
@@ -393,7 +407,7 @@
                             <button id="btnRemoveAno" onclick="removePeriodo('Ano')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompAnual"></canvas></div>
                 </div>
 
@@ -427,6 +441,10 @@
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group text-orange-500"></i> Backlog Retido</h3>
                             <p class="text-xs text-slate-500 mb-3">Dos tickets que ENTRARAM no período selecionado, mostra quantos ainda estão pendentes (em aberto) aguardando atendimento ou resposta.</p>
                         </div>
+                        <div class="border border-fuchsia-100 p-4 rounded-lg border-l-4 border-l-fuchsia-500">
+                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-share-nodes text-fuchsia-500"></i> Taxa de Escalonamento</h3>
+                            <p class="text-xs text-slate-500 mb-3">Proporção de tickets pendentes (Backlog) cujo status contém uma das palavras configuradas em STATUS_ESCALONAMENTO (hoje: 'desenvolvimento' e 'comercial'), indicando que estão parados em outro setor.</p>
+                        </div>
                         <div class="border border-red-100 p-4 rounded-lg border-l-4 border-l-red-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-calendar-days text-red-400"></i> Aging (Idade do Chamado)</h3>
                             <p class="text-xs text-slate-500 mb-3">Mede há quantos dias, em média, os chamados pendentes (Backlog Retido) estão parados na fila. Revela gargalos daquele período.</p>
@@ -449,7 +467,7 @@
                         </div>
                         <div class="border border-yellow-100 p-4 rounded-lg border-l-4 border-l-yellow-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-star text-yellow-400"></i> CSAT</h3>
-                            <p class="text-xs text-slate-500 mb-3">Média das avaliações válidas por chamado, em escala de 1 a 5. Se um chamado tiver várias perguntas de CSAT, cada pergunta válida é considerada uma vez e as notas são primeiro agrupadas por chamado. Na pesquisa binária de satisfação, Satisfeito vale 5 e Insatisfeito vale 1. Pesquisas NPS e Sim/Não não entram nesta nota porque usam escalas diferentes.</p>
+                            <p class="text-xs text-slate-500 mb-3">Índice médio de Satisfação do Cliente, gerado pelas respostas das pesquisas pós-atendimento.</p>
                         </div>
                         <div class="border border-amber-100 p-4 rounded-lg border-l-4 border-l-amber-500">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-amber-500"></i> Aderência CSAT</h3>
@@ -504,22 +522,25 @@
                                 <tr>
                                     <th class="px-4 py-3">ID</th>
                                     <th class="px-4 py-3">Razão Social / Cliente</th>
-                                    <th class="px-4 py-3">Data Base</th>
-                                    <th class="px-4 py-3">Semana Base</th>
+                                    <th class="px-4 py-3">Data Criação</th>
+                                    <th class="px-4 py-3">Data Resolução</th>
                                     <th class="px-4 py-3">Mês</th>
-                                    <th class="px-4 py-3">Semestre</th>
                                     <th class="px-4 py-3">Ano</th>
-                                    <th class="px-4 py-3">Canal (Origem)</th>
-                                    <th class="px-4 py-3">Urgência</th>
+                                    <th class="px-4 py-3">Origem</th>
+                                    <th class="px-4 py-3 text-center">Urgência</th>
                                     <th class="px-4 py-3">Analista</th>
-                                    <th class="px-4 py-3">Aging (Dias)</th>
-                                    <th class="px-4 py-3 text-center">Status SLA</th>
+                                    <th class="px-4 py-3 text-center">Base Status</th>
                                     <th class="px-4 py-3">Status Fila</th>
-                                    <th class="px-4 py-3">Espera</th>
-                                    <th class="px-4 py-3">Espera Chat</th>
-                                    <th class="px-4 py-3">Duração Chat</th>
+                                    <th class="px-4 py-3">Motivo Espera</th>
+                                    <th class="px-4 py-3 text-center">Escalonado</th>
                                     <th class="px-4 py-3">Causa Raiz</th>
+                                    <th class="px-4 py-3 text-center">Aging (Dias)</th>
+                                    <th class="px-4 py-3 text-center">MTTR (Horas)</th>
+                                    <th class="px-4 py-3 text-center">SLA</th>
                                     <th class="px-4 py-3 text-center">FCR</th>
+                                    <th class="px-4 py-3 text-center">CSAT</th>
+                                    <th class="px-4 py-3 text-center">Espera Chat</th>
+                                    <th class="px-4 py-3 text-center">Duração Chat</th>
                                 </tr>
                             </thead>
                             <tbody id="table-base-body" class="divide-y divide-slate-100"></tbody>
@@ -537,6 +558,9 @@
         // ==============================================================================
         const MOVIDESK_TOKEN = "88599593-1148-4b69-89ca-b4a2c55623aa"; 
         const META_ADERENCIA_CSAT = null; 
+        
+        // STATUS QUE CARACTERIZAM UM ESCALONAMENTO (Ex: Saiu do analista N1 e foi para outra equipa)
+        const STATUS_ESCALONAMENTO = ['desenvolvimento', 'comercial'];
 
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
@@ -691,10 +715,10 @@
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v35') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v36') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v35');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v36');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -724,7 +748,7 @@
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v35', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v36', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
@@ -807,6 +831,7 @@
                 'SLA Média':    {bg: 'bg-blue-50',    txt: 'text-blue-600',    ic: 'fa-stopwatch', bd: 'border-blue-100'},
                 'FCR':          {bg: 'bg-emerald-50', txt: 'text-emerald-600', ic: 'fa-bolt', bd: 'border-emerald-100'},
                 'MTTR':         {bg: 'bg-purple-50',  txt: 'text-purple-600',  ic: 'fa-clock-rotate-left', bd: 'border-purple-100'},
+                'Taxa Escalonamento': {bg: 'bg-fuchsia-50', txt: 'text-fuchsia-600', ic: 'fa-share-nodes', bd: 'border-fuchsia-100'},
                 'CSAT':         {bg: 'bg-yellow-50',  txt: 'text-yellow-600',  ic: 'fa-star', bd: 'border-yellow-100'},
                 'Aderência CSAT': {bg: 'bg-amber-50', txt: 'text-amber-600',   ic: 'fa-clipboard-check', bd: 'border-amber-100'}
             };
@@ -843,7 +868,7 @@
             if (diff !== 0) {
                 if (t.includes('Volume') || t.includes('Cancelados')) {
                     cor = 'text-slate-500';
-                } else if (t.includes('MTTR') || t.includes('Aging') || t.includes('Violado') || t.includes('Backlog')) {
+                } else if (t.includes('MTTR') || t.includes('Aging') || t.includes('Violado') || t.includes('Backlog') || t.includes('Escalonamento')) {
                     cor = diff > 0 ? 'text-red-500' : 'text-emerald-500';
                 } else {
                     cor = diff > 0 ? 'text-emerald-500' : 'text-red-500';
@@ -867,43 +892,9 @@
         }
 
         function processAndFormatData(ticketsArray, csatArray) {
-            // Converte apenas escalas de satisfação compatíveis para uma escala de 1 a 5.
-            // Tipo 1: 1 = satisfeito, 2 = insatisfeito. Tipo 2: carinhas de 1 a 5.
-            // NPS (tipo 3) e Sim/Não (tipo 4) não são CSAT e ficam fora da média.
-            const notaCsatValida = survey => {
-                const tipo = Number(survey.type);
-                const valorBruto = survey.value ?? survey.response ?? survey.rating;
-                const valor = Number(valorBruto);
-                if (!Number.isFinite(valor)) return null;
-                if (tipo === 1) return valor === 1 ? 5 : (valor === 2 ? 1 : null);
-                if (tipo === 2 && valor >= 1 && valor <= 5) return valor;
-                return null;
-            };
-
-            // Uma resposta por pergunta e chamado: se houver duplicata, mantém a mais recente.
-            const respostasPorTicket = new Map();
-            (Array.isArray(csatArray) ? csatArray : []).forEach(survey => {
-                if (!survey || survey.ticketId === null || survey.ticketId === undefined) return;
-                const nota = notaCsatValida(survey);
-                if (nota === null) return;
-
-                const ticketId = String(survey.ticketId);
-                const perguntaId = String(survey.questionId ?? `tipo-${survey.type}`);
-                const dataResposta = Date.parse(survey.responseDate || '') || 0;
-                if (!respostasPorTicket.has(ticketId)) respostasPorTicket.set(ticketId, new Map());
-                const respostasPorPergunta = respostasPorTicket.get(ticketId);
-                const anterior = respostasPorPergunta.get(perguntaId);
-                if (!anterior || dataResposta >= anterior.dataResposta) {
-                    respostasPorPergunta.set(perguntaId, { nota, dataResposta });
-                }
-            });
-
-            // Primeiro calcula a média das perguntas válidas de cada chamado.
-            // Assim, um chamado com mais perguntas não ganha peso extra na média geral.
-            const notasCsatMapeadas = Object.create(null);
-            respostasPorTicket.forEach((respostas, ticketId) => {
-                const notas = [...respostas.values()].map(resposta => resposta.nota);
-                if (notas.length) notasCsatMapeadas[ticketId] = notas.reduce((soma, nota) => soma + nota, 0) / notas.length;
+            let notasCsatMapeadas = {};
+            csatArray.forEach(survey => {
+                if(survey.ticketId) notasCsatMapeadas[survey.ticketId] = parseFloat(survey.value) || parseFloat(survey.response) || parseFloat(survey.rating) || 0;
             });
 
             const originMap = {
@@ -1006,6 +997,8 @@
                     }
                 }
 
+                const isEscalated = STATUS_ESCALONAMENTO.some(s => (ticket.status || "").toLowerCase().includes(s.toLowerCase()));
+
                 return {
                     "ID_Chamado": `#${ticket.id}`,
                     "Mes_Criacao": mesCriacao,
@@ -1033,6 +1026,7 @@
                     "Status": ticket.status || "Indefinido",
                     "Motivo_Espera": ticket.justification || "Nenhum",
                     "Causa_Raiz": ticket.category || "Não classificado",
+                    "Escalonado": isEscalated ? "Sim" : "Não",
                     "SLA_Status": slaStatus,
                     "FCR": ticket.resolvedInFirstCall ? "Sim" : "Não",
                     "MTTR_Horas": mttrHoras,
@@ -1383,6 +1377,10 @@
             const csatBase = baseResolvidos.length;
             const csatAderencia = csatBase > 0 ? (csatRespondidos / csatBase) * 100 : 0;
 
+            const isEscalated = (status) => STATUS_ESCALONAMENTO.some(s => status.toLowerCase().includes(s.toLowerCase()));
+            const escalonados = pendentes.filter(d => isEscalated(d.Status)).length;
+            const taxaEscalonamento = pendentes.length > 0 ? (escalonados / pendentes.length) * 100 : 0;
+
             const chatsDataset = baseRecebidos.filter(d => d.Is_Chat && d.BaseStatus !== "Canceled");
             const chatsAtendidos = chatsDataset.length;
             const chatsResolvidosPrimeiro = chatsDataset.filter(d => d.FCR === "Sim" && d.IsResolvido).length;
@@ -1401,7 +1399,7 @@
             const mediaEsperaSeg = nEspera > 0 ? (chatsComEspera.reduce((s, d) => s + d.Chat_Espera_Seg, 0) / nEspera) : null;
 
             return { 
-                recebidos, cancelados, backlog: pendentes.length, passivoResolvido, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, 
+                recebidos, cancelados, backlog: pendentes.length, passivoResolvido, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, escalonados, taxaEscalonamento, 
                 csat, csatRespondidos, csatBase, csatAderencia,
                 chat: {
                     atendidos: chatsAtendidos,
@@ -1445,6 +1443,7 @@
                 buildCardUI('Passivo Resolvido', m.passivoResolvido, getCardConfig('Passivo Resolvido')) +
                 buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
+                buildCardUI('Taxa Escalonamento', m.taxaEscalonamento.toFixed(1)+'%', getCardConfig('Taxa Escalonamento'), `${m.escalonados} de ${m.backlog} pendentes`) +
                 buildCardUI('Aging Médio', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
                 buildCardUI('SLA Violado', m.slaViolados, getCardConfig('SLA Violado')) +
                 buildCardUI('SLA Médio', m.slaRate.toFixed(1)+'%', getCardConfig('SLA Média')) +
@@ -1498,6 +1497,7 @@
                 buildCardUI('Passivo Resolvido', m.passivoResolvido, getCardConfig('Passivo Resolvido')) +
                 buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
+                buildCardUI('Taxa Escalonamento', m.taxaEscalonamento.toFixed(1)+'%', getCardConfig('Taxa Escalonamento'), `${m.escalonados} de ${m.backlog} pendentes`) +
                 buildCardUI('Aging', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
                 buildCardUI('SLA Violado', m.slaViolados, getCardConfig('SLA Violado')) +
                 buildCardUI('SLA Médio', m.slaRate.toFixed(1)+'%', getCardConfig('SLA Média')) +
@@ -1634,7 +1634,7 @@
                 let csatAdFormat = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
                 let csatAdSub = csatFailed ? '' : `<br><span class="text-[9px] text-slate-400">${m.csatRespondidos}/${m.csatBase}</span>`;
                 
-                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center text-indigo-600 font-bold">${m.passivoResolvido}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td><td class="px-4 py-4 text-center font-bold text-amber-600">${csatAdFormat}${csatAdSub}</td></tr>`;
+                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center text-indigo-600 font-bold">${m.passivoResolvido}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-fuchsia-600">${m.taxaEscalonamento.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td><td class="px-4 py-4 text-center font-bold text-amber-600">${csatAdFormat}${csatAdSub}</td></tr>`;
             }).join('');
 
             const baseOrdenada = [...filteredData].sort((a, b) => {
@@ -1650,21 +1650,24 @@
                     <td class="px-4 py-2 text-xs font-mono text-blue-600">${d.ID_Chamado}</td>
                     <td class="px-4 py-2 text-xs font-bold text-slate-700 truncate max-w-[200px]" title="${escapeHTML(d.Nome_Cliente)}">${escapeHTML(d.Nome_Cliente)}</td>
                     <td class="px-4 py-2 text-xs">${d.Data_Criacao}</td>
-                    <td class="px-4 py-2 text-xs text-slate-400">${d.Semana_Exibicao.includes(': ')?d.Semana_Exibicao.split(': ')[1]:d.Semana_Exibicao}</td>
+                    <td class="px-4 py-2 text-xs">${d.Data_Resolucao || '-'}</td>
                     <td class="px-4 py-2 text-xs font-bold text-slate-500">${d.Mes_Criacao}</td>
-                    <td class="px-4 py-2 text-xs font-bold text-slate-500">${d.Semestre_Criacao}</td>
                     <td class="px-4 py-2 text-xs font-bold text-slate-500">${d.Ano_Criacao}</td>
                     <td class="px-4 py-2 text-xs font-bold text-emerald-600">${escapeHTML(d.Origem)}</td>
-                    <td class="px-4 py-2 text-xs">${renderBadgeUrgencia(d.Urgencia)}</td>
+                    <td class="px-4 py-2 text-xs text-center">${renderBadgeUrgencia(d.Urgencia)}</td>
                     <td class="px-4 py-2 text-xs font-bold">${escapeHTML(d.Analista)}</td>
-                    <td class="px-4 py-2 text-xs text-center font-bold">${d.Aging_Dias.toFixed(1)}</td>
-                    <td class="px-4 py-2 text-center">${renderBadgeSla(d.SLA_Status)}</td>
+                    <td class="px-4 py-2 text-xs text-center font-bold text-slate-600">${escapeHTML(d.BaseStatus)}</td>
                     <td class="px-4 py-2 text-[10px] font-bold">${escapeHTML(d.Status)}</td>
                     <td class="px-4 py-2 text-xs truncate max-w-[150px]" title="${escapeHTML(d.Motivo_Espera)}">${escapeHTML(d.Motivo_Espera)}</td>
+                    <td class="px-4 py-2 text-xs text-center font-bold ${d.Escalonado === 'Sim' ? 'text-fuchsia-600' : 'text-slate-400'}">${d.Escalonado}</td>
+                    <td class="px-4 py-2 text-xs">${escapeHTML(d.Causa_Raiz)}</td>
+                    <td class="px-4 py-2 text-xs text-center font-bold">${d.Aging_Dias.toFixed(1)}</td>
+                    <td class="px-4 py-2 text-xs text-center font-bold text-purple-600">${d.MTTR_Horas.toFixed(1)}</td>
+                    <td class="px-4 py-2 text-center">${renderBadgeSla(d.SLA_Status)}</td>
+                    <td class="px-4 py-2 text-xs text-center font-bold ${d.FCR === 'Sim' ? 'text-emerald-600' : 'text-slate-400'}">${d.FCR}</td>
+                    <td class="px-4 py-2 text-xs text-center font-bold text-yellow-600">${d.CSAT > 0 ? d.CSAT.toFixed(1) : '-'}</td>
                     <td class="px-4 py-2 text-xs text-center font-mono">${formatarTempo(d.Chat_Espera_Seg)}</td>
                     <td class="px-4 py-2 text-xs text-center font-mono">${formatarTempo(d.Chat_Duracao_Seg)}</td>
-                    <td class="px-4 py-2 text-xs">${escapeHTML(d.Causa_Raiz)}</td>
-                    <td class="px-4 py-2 text-xs text-center">${d.FCR}</td>
                 </tr>`).join('');
         }
 
@@ -1685,6 +1688,7 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
+                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1716,6 +1720,7 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
+                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1747,6 +1752,7 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
+                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1778,6 +1784,7 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
+                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1809,6 +1816,7 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
+                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
