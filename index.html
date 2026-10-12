@@ -101,6 +101,7 @@
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-comparativo', this)"><i class="fa-solid fa-scale-balanced w-4"></i> Comparativos</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('visao-legendas', this)"><i class="fa-solid fa-book-open w-4"></i> Dicionário de Métricas</button>
             <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('base-dados', this)"><i class="fa-solid fa-database w-4"></i> Base de Chamados</button>
+            <button class="tab-btn text-left px-4 py-3 rounded text-sm font-medium hover:bg-slate-800 transition flex items-center gap-3" onclick="switchTab('auditoria-csat', this)"><i class="fa-solid fa-star text-yellow-400 w-4"></i> Auditoria CSAT</button>
         </div>
     </aside>
 
@@ -233,7 +234,7 @@
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-blue-600 text-base"></i> Indicadores Principais (Individual)
                     </h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4" id="cards-analista"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4" id="cards-analista"></div>
                 </div>
 
                 <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 print-break-inside">
@@ -300,9 +301,7 @@
                                     <th class="px-4 py-4 text-center">SLA Média (%)</th>
                                     <th class="px-4 py-4 text-center">SLA Violado</th>
                                     <th class="px-4 py-4 text-center">FCR (%)</th>
-                                    <th class="px-4 py-4 text-center">TMA</th>
                                     <th class="px-4 py-4 text-center">MTTR Médio</th>
-                                    <th class="px-4 py-4 text-center">Escalonamento (%)</th>
                                     <th class="px-4 py-4 text-center">CSAT</th>
                                     <th class="px-4 py-4 text-center">Aderência CSAT (%)</th>
                                 </tr>
@@ -331,7 +330,7 @@
                             <button id="btnRemoveDia" onclick="removePeriodo('Dia')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-diario"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompDiario"></canvas></div>
                 </div>
 
@@ -350,7 +349,7 @@
                             <button id="btnRemoveSem" onclick="removePeriodo('Sem')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semanal"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemanal"></canvas></div>
                 </div>
 
@@ -369,7 +368,7 @@
                             <button id="btnRemoveMes" onclick="removePeriodo('Mes')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-mensal"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompMensal"></canvas></div>
                 </div>
 
@@ -388,7 +387,7 @@
                             <button id="btnRemoveSemestre" onclick="removePeriodo('Semestre')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-semestral"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompSemestral"></canvas></div>
                 </div>
 
@@ -407,7 +406,7 @@
                             <button id="btnRemoveAno" onclick="removePeriodo('Ano')" class="hidden text-slate-400 hover:text-red-500 transition ml-1" title="Remover período"><i class="fa-solid fa-circle-minus text-lg"></i></button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 mb-6" id="cards-delta-anual"></div>
                     <div class="relative min-h-[250px] md:h-64 w-full"><canvas id="chartCompAnual"></canvas></div>
                 </div>
 
@@ -441,10 +440,6 @@
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group text-orange-500"></i> Backlog Retido</h3>
                             <p class="text-xs text-slate-500 mb-3">Dos tickets que ENTRARAM no período selecionado, mostra quantos ainda estão pendentes (em aberto) aguardando atendimento ou resposta.</p>
                         </div>
-                        <div class="border border-fuchsia-100 p-4 rounded-lg border-l-4 border-l-fuchsia-500">
-                            <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-share-nodes text-fuchsia-500"></i> Taxa de Escalonamento</h3>
-                            <p class="text-xs text-slate-500 mb-3">Proporção de tickets pendentes (Backlog) cujo status contém uma das palavras configuradas em STATUS_ESCALONAMENTO (hoje: 'desenvolvimento' e 'comercial'), indicando que estão parados em outro setor.</p>
-                        </div>
                         <div class="border border-red-100 p-4 rounded-lg border-l-4 border-l-red-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-calendar-days text-red-400"></i> Aging (Idade do Chamado)</h3>
                             <p class="text-xs text-slate-500 mb-3">Mede há quantos dias, em média, os chamados pendentes (Backlog Retido) estão parados na fila. Revela gargalos daquele período.</p>
@@ -467,7 +462,7 @@
                         </div>
                         <div class="border border-yellow-100 p-4 rounded-lg border-l-4 border-l-yellow-400">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-star text-yellow-400"></i> CSAT</h3>
-                            <p class="text-xs text-slate-500 mb-3">Índice médio de Satisfação do Cliente, gerado pelas respostas das pesquisas pós-atendimento.</p>
+                            <p class="text-xs text-slate-500 mb-3">Média das avaliações válidas por chamado, em escala de 1 a 5. Se um chamado tiver várias perguntas de CSAT, cada pergunta válida é considerada uma vez e as notas são primeiro agrupadas por chamado. Na pesquisa binária de satisfação, Satisfeito vale 5 e Insatisfeito vale 1. Pesquisas NPS e Sim/Não não entram nesta nota porque usam escalas diferentes.</p>
                         </div>
                         <div class="border border-amber-100 p-4 rounded-lg border-l-4 border-l-amber-500">
                             <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-amber-500"></i> Aderência CSAT</h3>
@@ -509,11 +504,11 @@
                 </div>
             </div>
 
-            <!-- TAB 5: BASE DE DADOS -->
+            <!-- TAB 5: BASE DE DADOS (CHAMADOS) -->
             <div id="base-dados" class="tab-content w-full">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px] md:h-[600px] w-full print-break-inside">
                     <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50">
-                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-list-ul text-blue-500 mr-2"></i> Base Analítica (Sincronizada)</h3>
+                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-list-ul text-blue-500 mr-2"></i> Base Analítica de Chamados (Sincronizada)</h3>
                         <span id="contador-base" class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider self-start md:self-auto">0 resultados</span>
                     </div>
                     <div class="flex-1 overflow-auto scrollbar-thin">
@@ -549,6 +544,32 @@
                 </div>
             </div>
 
+            <!-- TAB 6: AUDITORIA CSAT -->
+            <div id="auditoria-csat" class="tab-content w-full">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px] md:h-[600px] w-full print-break-inside">
+                    <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50">
+                        <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-star text-yellow-500 mr-2"></i> Auditoria de Respostas CSAT (Pergunta a Pergunta)</h3>
+                        <span id="contador-csat" class="bg-yellow-100 text-yellow-800 py-1 px-3 rounded-full text-[10px] font-bold tracking-wider self-start md:self-auto">0 avaliações</span>
+                    </div>
+                    <div class="flex-1 overflow-auto scrollbar-thin">
+                        <table class="w-full text-sm text-left whitespace-nowrap">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-4 py-3">ID do Chamado</th>
+                                    <th class="px-4 py-3">Nome do Analista</th>
+                                    <th class="px-4 py-3">Data da Resposta</th>
+                                    <th class="px-4 py-3">Nome do Cliente</th>
+                                    <th class="px-4 py-3 min-w-[250px]">A Pergunta Feita</th>
+                                    <th class="px-4 py-3 text-center">A Nota Dada (1-5)</th>
+                                    <th class="px-4 py-3 min-w-[300px]">Comentário Escrito</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-csat-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -558,8 +579,6 @@
         // ==============================================================================
         const MOVIDESK_TOKEN = "88599593-1148-4b69-89ca-b4a2c55623aa"; 
         const META_ADERENCIA_CSAT = null; 
-        
-        // STATUS QUE CARACTERIZAM UM ESCALONAMENTO (Ex: Saiu do analista N1 e foi para outra equipa)
         const STATUS_ESCALONAMENTO = ['desenvolvimento', 'comercial'];
 
         function escapeHTML(str) {
@@ -595,6 +614,8 @@
 
         let rawData = [];
         let filteredData = [];
+        let rawCsatItems = [];
+        let filteredCsatData = [];
         let charts = {};
 
         function toggleMenu() {
@@ -715,10 +736,10 @@
             }
             try {
                 Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v36') localStorage.removeItem(k);
+                    if(k.startsWith('movidesk_bi_cache_') && k !== 'movidesk_bi_cache_v37') localStorage.removeItem(k);
                 });
 
-                const cacheStr = localStorage.getItem('movidesk_bi_cache_v36');
+                const cacheStr = localStorage.getItem('movidesk_bi_cache_v37');
                 if (cacheStr) {
                     const cacheObj = JSON.parse(cacheStr);
                     const now = Date.now();
@@ -726,6 +747,7 @@
                     if (diffMins < 5) {
                         MovideskAPI.updateProgress(`Carregando cache super rápida...`);
                         await MovideskAPI.sleep(800); 
+                        rawCsatItems = cacheObj.csat || [];
                         return processAndFormatData(cacheObj.tickets, cacheObj.csat);
                     }
                 }
@@ -743,12 +765,13 @@
                 await MovideskAPI.sleep(6500);
                 const csatResult = await MovideskAPI.getCSAT(dataSomenteDia);
                 const csat = csatResult.items;
+                rawCsatItems = csat;
 
                 if (csatResult.failed) {
                     document.getElementById('csat-warning').classList.remove('hidden');
                 } else {
                     try {
-                        localStorage.setItem('movidesk_bi_cache_v36', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
+                        localStorage.setItem('movidesk_bi_cache_v37', JSON.stringify({ timestamp: Date.now(), tickets: tickets, csat: csat }));
                     } catch(e) {
                         console.warn("Aviso: Limite de armazenamento local excedido. O cache foi ignorado.", e);
                     }
@@ -831,7 +854,6 @@
                 'SLA Média':    {bg: 'bg-blue-50',    txt: 'text-blue-600',    ic: 'fa-stopwatch', bd: 'border-blue-100'},
                 'FCR':          {bg: 'bg-emerald-50', txt: 'text-emerald-600', ic: 'fa-bolt', bd: 'border-emerald-100'},
                 'MTTR':         {bg: 'bg-purple-50',  txt: 'text-purple-600',  ic: 'fa-clock-rotate-left', bd: 'border-purple-100'},
-                'Taxa Escalonamento': {bg: 'bg-fuchsia-50', txt: 'text-fuchsia-600', ic: 'fa-share-nodes', bd: 'border-fuchsia-100'},
                 'CSAT':         {bg: 'bg-yellow-50',  txt: 'text-yellow-600',  ic: 'fa-star', bd: 'border-yellow-100'},
                 'Aderência CSAT': {bg: 'bg-amber-50', txt: 'text-amber-600',   ic: 'fa-clipboard-check', bd: 'border-amber-100'}
             };
@@ -868,7 +890,7 @@
             if (diff !== 0) {
                 if (t.includes('Volume') || t.includes('Cancelados')) {
                     cor = 'text-slate-500';
-                } else if (t.includes('MTTR') || t.includes('Aging') || t.includes('Violado') || t.includes('Backlog') || t.includes('Escalonamento')) {
+                } else if (t.includes('MTTR') || t.includes('Aging') || t.includes('Violado') || t.includes('Backlog')) {
                     cor = diff > 0 ? 'text-red-500' : 'text-emerald-500';
                 } else {
                     cor = diff > 0 ? 'text-emerald-500' : 'text-red-500';
@@ -892,9 +914,37 @@
         }
 
         function processAndFormatData(ticketsArray, csatArray) {
-            let notasCsatMapeadas = {};
-            csatArray.forEach(survey => {
-                if(survey.ticketId) notasCsatMapeadas[survey.ticketId] = parseFloat(survey.value) || parseFloat(survey.response) || parseFloat(survey.rating) || 0;
+            const notaCsatValida = survey => {
+                const tipo = Number(survey.type);
+                const valorBruto = survey.value ?? survey.response ?? survey.rating;
+                const valor = Number(valorBruto);
+                if (!Number.isFinite(valor)) return null;
+                if (tipo === 1) return valor === 1 ? 5 : (valor === 2 ? 1 : null);
+                if (tipo === 2 && valor >= 1 && valor <= 5) return valor;
+                return null;
+            };
+
+            const respostasPorTicket = new Map();
+            (Array.isArray(csatArray) ? csatArray : []).forEach(survey => {
+                if (!survey || survey.ticketId === null || survey.ticketId === undefined) return;
+                const nota = notaCsatValida(survey);
+                if (nota === null) return;
+
+                const ticketId = String(survey.ticketId);
+                const perguntaId = String(survey.questionId ?? `tipo-${survey.type}`);
+                const dataResposta = Date.parse(survey.responseDate || '') || 0;
+                if (!respostasPorTicket.has(ticketId)) respostasPorTicket.set(ticketId, new Map());
+                const respostasPorPergunta = respostasPorTicket.get(ticketId);
+                const anterior = respostasPorPergunta.get(perguntaId);
+                if (!anterior || dataResposta >= anterior.dataResposta) {
+                    respostasPorPergunta.set(perguntaId, { nota, dataResposta });
+                }
+            });
+
+            const notasCsatMapeadas = Object.create(null);
+            respostasPorTicket.forEach((respostas, ticketId) => {
+                const notas = [...respostas.values()].map(resposta => resposta.nota);
+                if (notas.length) notasCsatMapeadas[ticketId] = notas.reduce((soma, nota) => soma + nota, 0) / notas.length;
             });
 
             const originMap = {
@@ -902,16 +952,6 @@
             };
 
             const hoje = new Date();
-
-            let diag = {
-                totalIsChat: 0,
-                brutoEspera: 0,
-                brutoTalk: 0,
-                convertidoEspera: 0,
-                convertidoTalk: 0,
-                naoConvertidos: [],
-                amostraChats: []
-            };
 
             const formatted = ticketsArray.map(ticket => {
                 const dataCriacao = new Date(ticket.createdDate);
@@ -971,32 +1011,6 @@
                 let esperaSeg = paraSegundos(ticket.chatWaitingTime);
                 let talkSeg = paraSegundos(ticket.chatTalkTime);
 
-                if (isChatOrWhats) {
-                    diag.totalIsChat++;
-                    
-                    let wTime = ticket.chatWaitingTime;
-                    let tTime = ticket.chatTalkTime;
-                    
-                    let hasBrutoEspera = wTime !== null && wTime !== undefined && String(wTime).trim() !== "";
-                    let hasBrutoTalk = tTime !== null && tTime !== undefined && String(tTime).trim() !== "";
-                    
-                    if (hasBrutoEspera) diag.brutoEspera++;
-                    if (hasBrutoTalk) diag.brutoTalk++;
-                    if (esperaSeg !== null) diag.convertidoEspera++;
-                    if (talkSeg !== null) diag.convertidoTalk++;
-                    
-                    if (hasBrutoEspera && esperaSeg === null && diag.naoConvertidos.length < 5) {
-                        diag.naoConvertidos.push({ field: 'chatWaitingTime', value: wTime, type: typeof wTime });
-                    }
-                    if (hasBrutoTalk && talkSeg === null && diag.naoConvertidos.length < 5) {
-                        diag.naoConvertidos.push({ field: 'chatTalkTime', value: tTime, type: typeof tTime });
-                    }
-                    
-                    if (diag.amostraChats.length < 5) {
-                        diag.amostraChats.push({ id: ticket.id, origin: ticket.origin, chatWaitingTime: wTime, chatTalkTime: tTime });
-                    }
-                }
-
                 const isEscalated = STATUS_ESCALONAMENTO.some(s => (ticket.status || "").toLowerCase().includes(s.toLowerCase()));
 
                 return {
@@ -1041,15 +1055,13 @@
                 };
             });
 
-            console.info("DIAGNOSTICO CHAT API:", diag);
-
             return formatted;
         }
 
         function getFiltroAtivoTexto() {
             const tabAtual = document.querySelector('.tab-content.active').id;
             let filtroTexto = "";
-            if (tabAtual === 'visao-geral' || tabAtual === 'base-dados') {
+            if (tabAtual === 'visao-geral' || tabAtual === 'base-dados' || tabAtual === 'auditoria-csat') {
                 const ano = document.getElementById('filterAno').value;
                 const mes = document.getElementById('filterMes').value;
                 const dia = document.getElementById('filterDia').value;
@@ -1136,11 +1148,13 @@
                 'visao-analista-diario': 'Acompanhamento Diário do Analista', 
                 'visao-comparativo': 'Painel de Comparativos', 
                 'visao-legendas': 'Dicionário de Métricas',
-                'base-dados': 'Extração Analítica Movidesk'
+                'base-dados': 'Extração Analítica Movidesk',
+                'auditoria-csat': 'Auditoria de Respostas CSAT'
             };
             document.getElementById('header-title').innerText = titles[tabId];
             if(window.innerWidth <= 768) toggleMenu();
             if(tabId === 'visao-analista-diario') renderDashAnalista();
+            if(tabId === 'auditoria-csat') renderAuditoriaCsat();
         }
 
         function addPeriodo(tipo) {
@@ -1321,11 +1335,15 @@
                 return okAno && okMes && okDia;
             });
             
+            const ticketIdsPermitidos = new Set(filteredData.map(d => d.ID_Chamado.replace('#','')));
+            filteredCsatData = rawCsatItems.filter(item => ticketIdsPermitidos.has(String(item.ticketId)));
+
             calculateGlobalKPIs();
             renderChartsGlobais();
             calcularComparativos();
             renderTabelasGerais();
             renderDashAnalista();
+            renderAuditoriaCsat();
         }
 
         function calcMetrics(dataset, targetMes = null, targetDia = null, targetSemana = null, targetSemestre = null, targetAno = null) {
@@ -1377,10 +1395,6 @@
             const csatBase = baseResolvidos.length;
             const csatAderencia = csatBase > 0 ? (csatRespondidos / csatBase) * 100 : 0;
 
-            const isEscalated = (status) => STATUS_ESCALONAMENTO.some(s => status.toLowerCase().includes(s.toLowerCase()));
-            const escalonados = pendentes.filter(d => isEscalated(d.Status)).length;
-            const taxaEscalonamento = pendentes.length > 0 ? (escalonados / pendentes.length) * 100 : 0;
-
             const chatsDataset = baseRecebidos.filter(d => d.Is_Chat && d.BaseStatus !== "Canceled");
             const chatsAtendidos = chatsDataset.length;
             const chatsResolvidosPrimeiro = chatsDataset.filter(d => d.FCR === "Sim" && d.IsResolvido).length;
@@ -1399,7 +1413,7 @@
             const mediaEsperaSeg = nEspera > 0 ? (chatsComEspera.reduce((s, d) => s + d.Chat_Espera_Seg, 0) / nEspera) : null;
 
             return { 
-                recebidos, cancelados, backlog: pendentes.length, passivoResolvido, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, escalonados, taxaEscalonamento, 
+                recebidos, cancelados, backlog: pendentes.length, passivoResolvido, agingMedio, resolvidos, slaRate, slaViolados, fcrRate, mttr, 
                 csat, csatRespondidos, csatBase, csatAderencia,
                 chat: {
                     atendidos: chatsAtendidos,
@@ -1443,7 +1457,6 @@
                 buildCardUI('Passivo Resolvido', m.passivoResolvido, getCardConfig('Passivo Resolvido')) +
                 buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
-                buildCardUI('Taxa Escalonamento', m.taxaEscalonamento.toFixed(1)+'%', getCardConfig('Taxa Escalonamento'), `${m.escalonados} de ${m.backlog} pendentes`) +
                 buildCardUI('Aging Médio', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
                 buildCardUI('SLA Violado', m.slaViolados, getCardConfig('SLA Violado')) +
                 buildCardUI('SLA Médio', m.slaRate.toFixed(1)+'%', getCardConfig('SLA Média')) +
@@ -1497,7 +1510,6 @@
                 buildCardUI('Passivo Resolvido', m.passivoResolvido, getCardConfig('Passivo Resolvido')) +
                 buildCardUI('Cancelados', m.cancelados, getCardConfig('Cancelados')) +
                 buildCardUI('Backlog Retido', m.backlog, getCardConfig('Backlog')) +
-                buildCardUI('Taxa Escalonamento', m.taxaEscalonamento.toFixed(1)+'%', getCardConfig('Taxa Escalonamento'), `${m.escalonados} de ${m.backlog} pendentes`) +
                 buildCardUI('Aging', m.agingMedio.toFixed(1)+'d', getCardConfig('Aging')) +
                 buildCardUI('SLA Violado', m.slaViolados, getCardConfig('SLA Violado')) +
                 buildCardUI('SLA Médio', m.slaRate.toFixed(1)+'%', getCardConfig('SLA Média')) +
@@ -1634,7 +1646,7 @@
                 let csatAdFormat = csatFailed ? '-' : m.csatAderencia.toFixed(1) + '%';
                 let csatAdSub = csatFailed ? '' : `<br><span class="text-[9px] text-slate-400">${m.csatRespondidos}/${m.csatBase}</span>`;
                 
-                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center text-indigo-600 font-bold">${m.passivoResolvido}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-fuchsia-600">${m.taxaEscalonamento.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td><td class="px-4 py-4 text-center font-bold text-amber-600">${csatAdFormat}${csatAdSub}</td></tr>`;
+                return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-4 md:px-6 py-4 font-bold text-slate-700">${escapeHTML(ana)}</td><td class="px-4 py-4 text-center">${m.resolvidos}</td><td class="px-4 py-4 text-center text-indigo-600 font-bold">${m.passivoResolvido}</td><td class="px-4 py-4 text-center font-black ${m.backlog>0?'text-orange-500':'text-slate-400'}">${m.backlog}</td><td class="px-4 py-4 text-center font-bold text-red-500">${m.agingMedio.toFixed(1)}d</td><td class="px-4 py-4 text-center text-blue-600 font-bold">${m.slaRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-red-700">${m.slaViolados}</td><td class="px-4 py-4 text-center text-emerald-600 font-bold">${m.fcrRate.toFixed(1)}%</td><td class="px-4 py-4 text-center font-bold text-purple-600">${m.mttr.toFixed(1)}h</td><td class="px-4 py-4 text-center font-bold text-yellow-600">${m.csat.toFixed(1)}</td><td class="px-4 py-4 text-center font-bold text-amber-600">${csatAdFormat}${csatAdSub}</td></tr>`;
             }).join('');
 
             const baseOrdenada = [...filteredData].sort((a, b) => {
@@ -1671,6 +1683,44 @@
                 </tr>`).join('');
         }
 
+        function renderAuditoriaCsat() {
+            const tbody = document.getElementById('table-csat-body');
+            const contador = document.getElementById('contador-csat');
+            if(!tbody) return;
+
+            contador.innerText = `${filteredCsatData.length} avaliações`;
+
+            if(filteredCsatData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Nenhuma resposta de CSAT encontrada para o período selecionado.</td></tr>`;
+                return;
+            }
+
+            const ticketOwnerMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Analista]));
+            const ticketClientMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Nome_Cliente]));
+
+            tbody.innerHTML = filteredCsatData.map(item => {
+                const tId = String(item.ticketId);
+                const analista = ticketOwnerMap.get(tId) || "Não Atribuído";
+                const cliente = ticketClientMap.get(tId) || "Cliente";
+                const dataResp = item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-';
+                const pergunta = item.questionDescription || item.question || "Pergunta de Satisfação";
+                const notaVal = item.value ?? item.response ?? item.rating ?? '-';
+                const comentario = item.comment || item.comments || '-';
+
+                return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="px-4 py-3 font-mono font-bold text-blue-600 text-xs">#${tId}</td>
+                        <td class="px-4 py-3 text-xs font-bold text-slate-700">${escapeHTML(analista)}</td>
+                        <td class="px-4 py-3 text-xs font-mono text-slate-500">${dataResp}</td>
+                        <td class="px-4 py-3 text-xs font-bold text-slate-700 truncate max-w-[150px]" title="${escapeHTML(cliente)}">${escapeHTML(cliente)}</td>
+                        <td class="px-4 py-3 text-xs text-slate-600 truncate max-w-[300px]" title="${escapeHTML(pergunta)}">${escapeHTML(pergunta)}</td>
+                        <td class="px-4 py-3 text-center font-black text-yellow-600 text-sm">${escapeHTML(notaVal)}</td>
+                        <td class="px-4 py-3 text-xs text-slate-500 truncate max-w-[350px]" title="${escapeHTML(comentario)}">${escapeHTML(comentario)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         function getLabelGrafico(val, tipo) {
             if(!val) return '';
             if(tipo === 'Sem' && val.includes(': ')) return val.split(': ')[1];
@@ -1688,7 +1738,6 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
-                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1720,7 +1769,6 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
-                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1752,7 +1800,6 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
-                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1784,7 +1831,6 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
-                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1816,7 +1862,6 @@
                     buildDeltaCard('Resolvidos', metA.resolvidos, metB.resolvidos, '', getCardConfig('Resolvidos')) + 
                     buildDeltaCard('Passivo Resolvido', metA.passivoResolvido, metB.passivoResolvido, '', getCardConfig('Passivo Resolvido')) + 
                     buildDeltaCard('Backlog', metA.backlog, metB.backlog, '', getCardConfig('Backlog')) +
-                    buildDeltaCard('Taxa Escalonamento', metA.taxaEscalonamento, metB.taxaEscalonamento, '%', getCardConfig('Taxa Escalonamento')) + 
                     buildDeltaCard('Aging', metA.agingMedio, metB.agingMedio, 'd', getCardConfig('Aging')) +
                     buildDeltaCard('SLA Violado', metA.slaViolados, metB.slaViolados, '', getCardConfig('SLA Violado')) + 
                     buildDeltaCard('SLA Média', metA.slaRate, metB.slaRate, '%', getCardConfig('SLA Média')) + 
@@ -1841,8 +1886,30 @@
         }
 
         function exportToExcel() {
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(filteredData), "Base_Movidesk");
-            XLSX.writeFile(wb, `Extracao_Suporte_${new Date().getTime()}.xlsx`);
+            const tabAtual = document.querySelector('.tab-content.active').id;
+            let wb = XLSX.utils.book_new();
+
+            if (tabAtual === 'auditoria-csat') {
+                const dadosCsatExport = filteredCsatData.map(item => {
+                    const tId = String(item.ticketId);
+                    const ticketOwnerMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Analista]));
+                    const ticketClientMap = new Map(rawData.map(d => [d.ID_Chamado.replace('#',''), d.Nome_Cliente]));
+                    return {
+                        "ID do Chamado": `#${tId}`,
+                        "Nome do Analista": ticketOwnerMap.get(tId) || "Não Atribuído",
+                        "Data da Resposta": item.responseDate ? new Date(item.responseDate).toLocaleString('pt-BR') : '-',
+                        "Nome do Cliente": ticketClientMap.get(tId) || "Cliente",
+                        "A Pergunta Feita": item.questionDescription || item.question || "Pergunta de Satisfação",
+                        "A Nota Dada (1-5)": item.value ?? item.response ?? item.rating ?? '-',
+                        "Comentário Escrito": item.comment || item.comments || '-'
+                    };
+                });
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dadosCsatExport), "Auditoria_CSAT");
+                XLSX.writeFile(wb, `Auditoria_CSAT_${new Date().getTime()}.xlsx`);
+            } else {
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(filteredData), "Base_Movidesk");
+                XLSX.writeFile(wb, `Extracao_Suporte_${new Date().getTime()}.xlsx`);
+            }
         }
     </script>
 </body>
